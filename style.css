@@ -1,11 +1,12 @@
 body {
     margin: 0;
     overflow: hidden;
-    background: #000;
     font-family: 'Arial', sans-serif;
-    background: url('https://i.imgur.com/zY3n7U8.jpg') no-repeat center center fixed;
-    background-size: cover;
+
+    /* خلفية فضائية بدون صورة خارجية */
+    background: radial-gradient(circle at top, #202442 0, #050713 40%, #000000 80%);
 }
+
 
 /* NAVBAR */
 #navbar {
