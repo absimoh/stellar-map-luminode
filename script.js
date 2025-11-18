@@ -3,7 +3,8 @@
 // =======================
 
 const canvas = document.getElementById("sky");
-const renderer = new THREE.WebGLRenderer({ canvas });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 const scene = new THREE.Scene();
@@ -24,7 +25,7 @@ controls.enablePan = false;
 
 const effect = new THREE.OutlineEffect(renderer);
 
-// سماء خارجية
+// Sky sphere
 const skyGeo = new THREE.SphereGeometry(50, 64, 64);
 const skyMat = new THREE.MeshBasicMaterial({
   color: 0x050505,
@@ -175,43 +176,12 @@ function startCameraMove(targetMesh) {
   camFrom.copy(camera.position);
 
   const dir = targetMesh.position.clone().normalize();
-  const camDistance = 20; // صغّر الرقم لو تبي زوم أقوى
+  const camDistance = 20; // قلّله (مثلاً 15) لو تبي زوم أقوى
   camTo.copy(dir.multiplyScalar(camDistance));
 
   targetFrom.copy(controls.target);
   targetTo.copy(targetMesh.position);
 }
-
-// =======================
-//   MAIN ANIMATION LOOP
-// =======================
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  if (cameraAnimating) {
-    const now = performance.now();
-    let t = (now - camStartTime) / CAM_DURATION;
-    if (t >= 1) {
-      t = 1;
-      cameraAnimating = false;
-    }
-    const e = easeInOut(t);
-
-    camera.position.lerpVectors(camFrom, camTo, e);
-    controls.target.lerpVectors(targetFrom, targetTo, e);
-  }
-
-  controls.update();
-  effect.render(scene, camera);
-}
-animate();
-
-window.addEventListener("resize", () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-});
 
 // =======================
 //   PLANET PHYSICAL INFO
@@ -266,15 +236,85 @@ const planetInfo = {
 };
 
 // =======================
+//   UI HELPERS
+// =======================
+
+const objNameEl = document.getElementById("objName");
+const objTypeEl = document.getElementById("objType");
+const objRAEl   = document.getElementById("objRA");
+const objDECEl  = document.getElementById("objDEC");
+const searchMessage = document.getElementById("searchMessage");
+
+function updateObjectInfo(found) {
+  const ra = found.data.ra.toFixed(3);
+  const dec = found.data.dec.toFixed(3);
+  const typeUpper = found.data.type.toUpperCase();
+  const objName = found.data.name;
+
+  // Panel العلوي
+  objNameEl.textContent = objName;
+  objTypeEl.textContent = "Type: " + typeUpper;
+  objRAEl.textContent   = "RA: " + ra;
+  objDECEl.textContent  = "DEC: " + dec;
+
+  // نص تحت البحث
+  const info = planetInfo[objName];
+
+  if (found.data.type === "planet" && info) {
+    searchMessage.innerHTML = `
+      <strong>${info.title}</strong><br>
+      Name: ${objName}<br>
+      Type: ${typeUpper}<br>
+      RA: ${ra} · DEC: ${dec}<br><br>
+      ${info.moons}<br>
+      ${info.gravity}<br>
+      Orbit: ${info.orbit}<br>
+      ${info.day}<br>
+      ${info.year}<br><br>
+      ${info.note}
+    `;
+  } else {
+    searchMessage.innerHTML = `
+      <strong>${objName}</strong><br>
+      Type: ${typeUpper}<br>
+      RA: ${ra} · DEC: ${dec}<br><br>
+      No detailed physical data stored for this object, but it is part of the simulated stellar field.
+    `;
+  }
+}
+
+// =======================
+//   RAYCAST: CLICK ON OBJECT
+// =======================
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+window.addEventListener("click", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(allObjects.map(o => o.mesh));
+
+  if (hits.length > 0) {
+    const found = allObjects.find(o => o.mesh === hits[0].object);
+    if (!found) return;
+    startCameraMove(found.mesh);
+    updateObjectInfo(found);
+  }
+});
+
+// =======================
 //   SEARCH BY NAME
 // =======================
 
 const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const searchMessage = document.getElementById("searchMessage");
+const searchBtn   = document.getElementById("searchBtn");
 
 if (searchBtn && searchInput && searchMessage) {
-  searchBtn.addEventListener("click", () => {
+  function performSearch() {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) {
       searchMessage.textContent = "Enter a name first (e.g., Earth, Mars, Jupiter, Star 10).";
@@ -291,38 +331,105 @@ if (searchBtn && searchInput && searchMessage) {
       return;
     }
 
-    // حرّك الكاميرا إلى الجسم
     startCameraMove(found.mesh);
+    updateObjectInfo(found);
+  }
 
-    const ra = found.data.ra.toFixed(3);
-    const dec = found.data.dec.toFixed(3);
-    const typeUpper = found.data.type.toUpperCase();
-    const objName = found.data.name;
-
-    const info = planetInfo[objName];
-
-    // لو كوكب وله بيانات
-    if (found.data.type === "planet" && info) {
-      searchMessage.innerHTML = `
-        <strong>${info.title}</strong><br>
-        Name: ${objName}<br>
-        Type: ${typeUpper}<br>
-        RA: ${ra} · DEC: ${dec}<br>
-        ${info.moons}<br>
-        ${info.gravity}<br>
-        Orbit: ${info.orbit}<br>
-        ${info.day}<br>
-        ${info.year}<br>
-        Notes: ${info.note}
-      `;
-    } else {
-      // نجوم أو أشياء ما عندها جدول معلومات
-      searchMessage.innerHTML = `
-        <strong>${objName}</strong><br>
-        Type: ${typeUpper}<br>
-        RA: ${ra} · DEC: ${dec}<br>
-        No detailed physical data available for this object.
-      `;
-    }
+  searchBtn.addEventListener("click", performSearch);
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") performSearch();
   });
 }
+
+// =======================
+//   NAVBAR BUTTONS
+// =======================
+
+const resetViewBtn   = document.getElementById("resetView");
+const toggleLabelsBtn= document.getElementById("toggleLabels");
+const showStarsBtn   = document.getElementById("showStars");
+const showPlanetsBtn = document.getElementById("showPlanets");
+const showAllBtn     = document.getElementById("showAll");
+const themeSwitchBtn = document.getElementById("themeSwitch");
+
+let labelsVisible = true;
+let themeIndex = 0;
+
+if (resetViewBtn) {
+  resetViewBtn.onclick = () => {
+    camera.position.set(0, 0, 3);
+    controls.target.set(0, 0, 0);
+    cameraAnimating = false;
+  };
+}
+
+if (toggleLabelsBtn) {
+  toggleLabelsBtn.onclick = () => {
+    labelsVisible = !labelsVisible;
+    allLabels.forEach(l => l.visible = labelsVisible);
+  };
+}
+
+if (showStarsBtn) {
+  showStarsBtn.onclick = () => {
+    starsList.forEach(s => { s.star.visible = true; s.glow.visible = true; });
+    planetsList.forEach(p => { p.star.visible = false; p.glow.visible = false; });
+  };
+}
+
+if (showPlanetsBtn) {
+  showPlanetsBtn.onclick = () => {
+    starsList.forEach(s => { s.star.visible = false; s.glow.visible = false; });
+    planetsList.forEach(p => { p.star.visible = true; p.glow.visible = true; });
+  };
+}
+
+if (showAllBtn) {
+  showAllBtn.onclick = () => {
+    starsList.forEach(s => { s.star.visible = true; s.glow.visible = true; });
+    planetsList.forEach(p => { p.star.visible = true; p.glow.visible = true; });
+  };
+}
+
+if (themeSwitchBtn) {
+  themeSwitchBtn.onclick = () => {
+    themeIndex = (themeIndex + 1) % 3;
+    if (themeIndex === 0)
+      document.body.style.background = "radial-gradient(circle at top, #202442, #050713, #000000)";
+    if (themeIndex === 1)
+      document.body.style.background = "radial-gradient(circle at top, #0b1220, #020617, #000000)";
+    if (themeIndex === 2)
+      document.body.style.background = "radial-gradient(circle at top, #1f2937, #020617, #000000)";
+  };
+}
+
+// =======================
+//   MAIN LOOP & RESIZE
+// =======================
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (cameraAnimating) {
+    const now = performance.now();
+    let t = (now - camStartTime) / CAM_DURATION;
+    if (t >= 1) {
+      t = 1;
+      cameraAnimating = false;
+    }
+    const e = easeInOut(t);
+
+    camera.position.lerpVectors(camFrom, camTo, e);
+    controls.target.lerpVectors(targetFrom, targetTo, e);
+  }
+
+  controls.update();
+  effect.render(scene, camera);
+}
+animate();
+
+window.addEventListener("resize", () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
