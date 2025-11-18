@@ -11,7 +11,7 @@ body {
     overflow: hidden;
 }
 
-/* Canvas خلفي */
+/* Background canvas */
 #sky {
     position: fixed;
     top: 0;
@@ -21,23 +21,62 @@ body {
     z-index: 0;
 }
 
-/* ===== NAVBAR (مخفي) ===== */
+/* ===== NAVBAR ===== */
 #navbar {
-    display: none;              /* نخفي الشريط بالكامل */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    padding: 10px 20px;
+    background: rgba(3, 6, 23, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-/* ===== SIDEBAR (يسار) ===== */
+#logo {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #60a5fa;
+}
+
+#nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: #111827;
+    border: 1px solid #374151;
+    color: #d1d5db;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background: #1f2937;
+    transform: translateY(-1px);
+}
+
+/* ===== SIDEBAR (LEFT) ===== */
 #sidebar {
     position: fixed;
-    top: 40px;
+    top: 80px;
     left: 20px;
     width: 280px;
     padding: 20px;
     border-radius: 24px;
-    background: rgba(10, 12, 30, 0.92);
+    background: rgba(10, 12, 30, 0.94);
     backdrop-filter: blur(10px);
     z-index: 5;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
 }
 
 #sidebar h2 {
@@ -55,29 +94,52 @@ body {
     margin-top: 18px;
     padding: 14px 16px;
     border-radius: 18px;
-    background: rgba(17, 24, 39, 0.9);
+    background: rgba(17, 24, 39, 0.95);
     border: 1px solid rgba(55, 65, 81, 0.7);
 }
 
-/* ===== INFO PANEL (مخفي حالياً) ===== */
-#infoPanel {
-    display: none;
+/* ===== RIGHT COLUMN ===== */
+#rightColumn {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 5;
 }
 
-/* ===== SEARCH PANEL (يمين) ===== */
+/* Info panel */
+#infoPanel {
+    padding: 18px 20px;
+    border-radius: 22px;
+    background: rgba(10, 12, 30, 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    text-align: left;
+}
+
+#infoPanel h2 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    color: #93c5fd;
+}
+
+#infoPanel p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+/* Search panel */
 #searchPanel {
-    position: fixed;
-    top: 40px;
-    right: 40px;
-    width: 320px;
     padding: 16px 18px;
     border-radius: 22px;
-    background: rgba(10, 12, 30, 0.92);
+    background: rgba(10, 12, 30, 0.94);
     backdrop-filter: blur(10px);
-    z-index: 5;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
     font-size: 14px;
-    color: #e5e7eb;
 }
 
 #searchPanel h3 {
@@ -86,49 +148,45 @@ body {
     color: #a5b4fc;
 }
 
+#searchPanel .hint {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
 #searchPanel input {
     width: 100%;
-    padding: 6px 8px;
+    padding: 7px 9px;
     border-radius: 10px;
     border: 1px solid #4b5563;
     background: #020617;
     color: #e5e7eb;
+    font-size: 14px;
+}
+
+.search-btn {
+    margin-top: 8px;
+    width: 100%;
+    text-align: center;
 }
 
 #searchMessage {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 13px;
-    color: #f9fafb;
-}
-
-/* زر بحث */
-.nav-btn {
-    background: #111827;
-    border: 1px solid #374151;
-    color: #d1d5db;
-    padding: 8px 16px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-.nav-btn:hover {
-    background: #1f2937;
-    transform: translateY(-1px);
+    color: #e5e7eb;
+    line-height: 1.5;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
     #sidebar {
-        top: 20px;
+        top: 80px;
         left: 10px;
         width: 240px;
     }
 
-    #searchPanel {
+    #rightColumn {
         right: 10px;
-        top: 20px;
         width: 260px;
     }
 }
