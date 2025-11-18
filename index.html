@@ -51,7 +51,24 @@
 <!-- CANVAS -->
 <canvas id="sky"></canvas>
 
-<!-- MODULE SCRIPT -->
+<!-- THREE.JS GLOBAL IMPORT -->
+<script type="module">
+    import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
+    window.THREE = THREE;
+</script>
+
+<!-- ORBIT CONTROLS + OUTLINE EFFECT -->
+<script type="module">
+    import { OrbitControls } 
+    from "https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js";
+    import { OutlineEffect } 
+    from "https://unpkg.com/three@0.152.2/examples/jsm/effects/OutlineEffect.js";
+
+    window.OrbitControls = OrbitControls;
+    window.OutlineEffect = OutlineEffect;
+</script>
+
+<!-- MAIN APP -->
 <script type="module" src="./script.js"></script>
 
 </body>
