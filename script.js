@@ -35,18 +35,16 @@ scene.add(sky);
 // ====== OUTLINE (Glow Engine) ======
 const effect = new THREE.OutlineEffect(renderer);
 
-// ====== LABEL SYSTEM ======
+// ====== LABEL / FILTER SYSTEM ======
 let labelsVisible = true;
 let allLabels = [];
-
-// Lists for filters
 let starsList = [];
 let planetsList = [];
 
 // ====== RAYCASTER (for clicking) ======
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-let allObjects = [];   // store clickable objects (stars + planets)
+let allObjects = [];   // clickable objects (stars + planets)
 
 // ====== CREATE LABELS ======
 function createLabel(text, position) {
@@ -71,68 +69,144 @@ function createLabel(text, position) {
     return sprite;
 }
 
-// ====== FETCH ASTRONOMICAL OBJECTS ======
-fetch("https://api.stellarium.org/api/objects")
-    .then(res => res.json())
-    .then(data => {
-        data.forEach(obj => {
-            let color;
+// ====== GENERATE RANDOM STARS (NO EXTERNAL API) ======
+function generateStars() {
+    const NUM_STARS = 600;
 
-            if (obj.type === "star") color = 0xffffff;
-            else if (obj.type === "planet") color = 0xffdd00;
-            else return;
+    for (let i = 0; i < NUM_STARS; i++) {
+        const color = 0xffffff;
 
-            const ra = obj.ra * (Math.PI / 180);
-            const dec = obj.dec * (Math.PI / 180);
-            const r = 50;
+        // random angles (like RA / DEC)
+        const theta = Math.random() * Math.PI * 2;     // 0..2π
+        const phi   = (Math.random() - 0.5) * Math.PI; // -π/2..π/2
+        const r = 50;
 
-            const pos = new THREE.Vector3(
-                r * Math.cos(dec) * Math.cos(ra),
-                r * Math.sin(dec),
-                r * Math.cos(dec) * Math.sin(ra)
-            );
+        const pos = new THREE.Vector3(
+            r * Math.cos(phi) * Math.cos(theta),
+            r * Math.sin(phi),
+            r * Math.cos(phi) * Math.sin(theta)
+        );
 
-            // ====== MAIN STAR / PLANET ======
-            const star = new THREE.Mesh(
-                new THREE.SphereGeometry(0.04, 16, 16),
-                new THREE.MeshBasicMaterial({ color })
-            );
+        // main star
+        const star = new THREE.Mesh(
+            new THREE.SphereGeometry(0.035, 12, 12),
+            new THREE.MeshBasicMaterial({ color })
+        );
 
-            // ====== GLOW SPHERE ======
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.35
-            });
-
-            const glow = new THREE.Mesh(
-                new THREE.SphereGeometry(0.1, 16, 16),
-                glowMaterial
-            );
-
-            glow.position.copy(pos);
-            star.position.copy(pos);
-
-            scene.add(glow);
-            scene.add(star);
-
-            // store for filters
-            if (obj.type === "star") starsList.push({ star, glow });
-            if (obj.type === "planet") planetsList.push({ star, glow });
-
-            // store for click selection
-            allObjects.push({
-                mesh: star,
-                data: obj
-            });
-
-            // ====== LABELS ======
-            if (obj.name) {
-                const label = createLabel(obj.name, pos);
-                scene.add(label);
-            }
+        // glow
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.35
         });
+
+        const glow = new THREE.Mesh(
+            new THREE.SphereGeometry(0.09, 12, 12),
+            glowMaterial
+        );
+
+        star.position.copy(pos);
+        glow.position.copy(pos);
+
+        scene.add(glow);
+        scene.add(star);
+
+        // خزنهم عشان الفلاتر
+        starsList.push({ star, glow });
+
+        // خزن بعض النجوم بأسماء
+        let labelName = null;
+        if (i === 10) labelName = "Star A";
+        if (i === 40) labelName = "Star B";
+        if (i === 100) labelName = "Star C";
+        if (i === 200) labelName = "Star D";
+        if (i === 300) labelName = "Star E";
+
+        const dataObj = {
+            name: labelName || `Star ${i + 1}`,
+            type: "star",
+            ra: theta,
+            dec: phi
+        };
+
+        allObjects.push({
+            mesh: star,
+            data: dataObj
+        });
+
+        if (labelName) {
+            const label = createLabel(labelName, pos);
+            scene.add(label);
+        }
+    }
+}
+
+// ====== GENERATE PLANETS (LOCAL DATA) ======
+function generatePlanets() {
+    const planetsData = [
+        { name: "Mercury", color: 0xffcc66, theta: 0.2,  phi: 0.1 },
+        { name: "Venus",   color: 0xffe6a3, theta: 1.0,  phi: 0.05 },
+        { name: "Earth",   color: 0x66aaff, theta: 1.8,  phi: 0.0 },
+        { name: "Mars",    color: 0xff5533, theta: 2.4,  phi: -0.05 },
+        { name: "Jupiter", color: 0xffddaa, theta: 3.1,  phi: 0.12 },
+        { name: "Saturn",  color: 0xffdd88, theta: 4.0,  phi: -0.1 },
+        { name: "Uranus",  color: 0x88ddff, theta: 4.8,  phi: 0.15 },
+        { name: "Neptune", color: 0x5588ff, theta: 5.6,  phi: -0.12 }
+    ];
+
+    const r = 45;
+
+    planetsData.forEach(p => {
+        const pos = new THREE.Vector3(
+            r * Math.cos(p.phi) * Math.cos(p.theta),
+            r * Math.sin(p.phi),
+            r * Math.cos(p.phi) * Math.sin(p.theta)
+        );
+
+        const planet = new THREE.Mesh(
+            new THREE.SphereGeometry(0.08, 20, 20),
+            new THREE.MeshBasicMaterial({ color: p.color })
+        );
+
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: p.color,
+            transparent: true,
+            opacity: 0.45
+        });
+
+        const glow = new THREE.Mesh(
+            new THREE.SphereGeometry(0.16, 20, 20),
+            glowMaterial
+        );
+
+        planet.position.copy(pos);
+        glow.position.copy(pos);
+
+        scene.add(glow);
+        scene.add(planet);
+
+        planetsList.push({ star: planet, glow });
+
+        const dataObj = {
+            name: p.name,
+            type: "planet",
+            ra: p.theta,
+            dec: p.phi
+        };
+
+        allObjects.push({
+            mesh: planet,
+            data: dataObj
+        });
+
+        const label = createLabel(p.name, pos);
+        scene.add(label);
     });
+}
+
+// شغّل التوليد
+generateStars();
+generatePlanets();
 
 // ====== BUTTONS ======
 
@@ -173,10 +247,8 @@ document.getElementById("themeSwitch").addEventListener("click", () => {
 
     if (theme === 0)
         document.body.style.backgroundImage = "url('https://i.imgur.com/zY3n7U8.jpg')";
-
     if (theme === 1)
         document.body.style.backgroundImage = "url('https://i.imgur.com/8o9dKBl.jpg')";
-
     if (theme === 2)
         document.body.style.backgroundImage = "url('https://i.imgur.com/FrDqPMi.jpg')";
 });
