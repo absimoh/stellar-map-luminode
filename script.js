@@ -42,7 +42,7 @@ let planetsList = [];
 let allLabels = [];
 let allObjects = [];
 
-// Create label (لو حبيت ترجعها لاحقاً)
+// Create label (لو احتجناها لاحقاً)
 function createLabel(text, position) {
   const c = document.createElement("canvas");
   const ctx = c.getContext("2d");
@@ -144,7 +144,7 @@ function generatePlanets() {
     scene.add(planet, glow);
     planetsList.push({ star: planet, glow });
 
-    createLabel(p.name, pos); // لو تبي تخفي اللّيبلز لاحقاً نقدر نضيف زر
+    createLabel(p.name, pos); // اسم الكوكب فوقه
 
     allObjects.push({
       mesh: planet,
@@ -157,7 +157,7 @@ function generatePlanets() {
 generateStars();
 generatePlanets();
 
-// Raycaster (لو حبيت تكمل عليه لاحقاً)
+// Raycaster (اختياري للنقر)
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -171,15 +171,58 @@ window.addEventListener("click", (event) => {
   if (hits.length > 0) {
     const obj = allObjects.find((o) => o.mesh === hits[0].object);
     if (!obj) return;
-
-    // حالياً بس نطبع بالكونسول
     console.log("Clicked:", obj.data.name, obj.data.type);
   }
 });
 
-// Animate
+// =======================
+//   CAMERA ANIMATION
+// =======================
+
+let cameraAnimating = false;
+let camFrom = new THREE.Vector3();
+let camTo = new THREE.Vector3();
+let targetFrom = new THREE.Vector3();
+let targetTo = new THREE.Vector3();
+let camStartTime = 0;
+const CAM_DURATION = 800; // ms
+
+function easeInOut(t) {
+  // smoothstep تقريبًا
+  return t * t * (3 - 2 * t);
+}
+
+function startCameraMove(targetMesh) {
+  cameraAnimating = true;
+  camStartTime = performance.now();
+
+  camFrom.copy(camera.position);
+
+  // نخلي الكاميرا قريبة من الجسم لكن أبعد شوي عنه
+  const dir = targetMesh.position.clone().normalize();
+  camTo.copy(dir.multiplyScalar(40)); // الجسم عند ~45-50، الكاميرا عند 40
+
+  targetFrom.copy(controls.target);
+  targetTo.copy(targetMesh.position);
+}
+
+// Animate loop
 function animate() {
   requestAnimationFrame(animate);
+
+  if (cameraAnimating) {
+    const now = performance.now();
+    let t = (now - camStartTime) / CAM_DURATION;
+    if (t >= 1) {
+      t = 1;
+      cameraAnimating = false;
+    }
+    const e = easeInOut(t);
+
+    camera.position.lerpVectors(camFrom, camTo, e);
+    controls.target.lerpVectors(targetFrom, targetTo, e);
+  }
+
   controls.update();
   effect.render(scene, camera);
 }
@@ -208,7 +251,7 @@ if (searchBtn && searchInput && searchMessage) {
       return;
     }
 
-    // اسم الكوكب/النجم (case-insensitive)
+    // ابحث بالاسم بالضبط (Earth, Mars, Jupiter, Star 10 ...)
     const found = allObjects.find(
       (o) => o.data.name.toLowerCase() === q
     );
@@ -218,14 +261,13 @@ if (searchBtn && searchInput && searchMessage) {
       return;
     }
 
-    // تحريك الكاميرا ناحيته
-    const targetPos = found.mesh.position
-      .clone()
-      .normalize()
-      .multiplyScalar(3);
-    camera.position.copy(targetPos);
-    camera.lookAt(found.mesh.position);
+    // حرّك الكاميرا بانيميشن ناعم
+    startCameraMove(found.mesh);
 
-    searchMessage.textContent = "Focused on " + found.data.name;
+    // معلومات احترافية تحت البحث
+    const ra = found.data.ra.toFixed(3);
+    const dec = found.data.dec.toFixed(3);
+    searchMessage.textContent =
+      `Focused on ${found.data.name} · Type: ${found.data.type.toUpperCase()} · RA: ${ra} · DEC: ${dec}`;
   });
 }
