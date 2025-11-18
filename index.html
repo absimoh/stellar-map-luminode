@@ -8,10 +8,38 @@
 </head>
 <body>
 
-<div id="header">🌌 LUMINODE — Stellar 3D Sky Map</div>
+<!-- TOP NAV BAR -->
+<div id="navbar">
+    <div id="logo">LUMINODE</div>
+    <div id="nav-buttons">
+        <button class="nav-btn" id="resetView">Reset View</button>
+        <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <h2>🌌 Stellar Map</h2>
+    <p>Explore stars, planets, and constellations in full 3D.</p>
+
+    <div class="info-box">
+        <h3>Project</h3>
+        <p>LUMINODE | Stellar 3D Mapping</p>
+    </div>
+
+    <div class="info-box">
+        <h3>Controls</h3>
+        <p>🖱️ Rotate: Drag mouse</p>
+        <p>🔍 Zoom: Scroll wheel</p>
+        <p>🪐 Explore: Move freely</p>
+    </div>
+</div>
+
 <canvas id="sky"></canvas>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/js/effects/OutlineEffect.js"></script>
 <script src="script.js"></script>
 
 </body>

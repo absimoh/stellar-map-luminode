@@ -14,7 +14,18 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.z = 3;
 
-// ====== CREATE SKY SPHERE ======
+// ====== ORBIT CONTROLS ======
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.04;
+
+controls.enableRotate = true;
+controls.enableZoom = true;
+controls.zoomSpeed = 1.0;
+
+controls.enablePan = false;
+
+// ====== SKY SPHERE ======
 const skyGeometry = new THREE.SphereGeometry(50, 64, 64);
 const skyMaterial = new THREE.MeshBasicMaterial({
     color: 0x050505,
@@ -23,7 +34,29 @@ const skyMaterial = new THREE.MeshBasicMaterial({
 const sky = new THREE.Mesh(skyGeometry, skyMaterial);
 scene.add(sky);
 
-// ====== FETCH ASTRONOMY DATA FROM STELLARIUM API ======
+// ====== GLOW OUTLINE EFFECT ======
+const effect = new THREE.OutlineEffect(renderer);
+
+// ====== FUNCTION TO CREATE LABELS ======
+function createLabel(text, position) {
+    const labelCanvas = document.createElement("canvas");
+    const ctx = labelCanvas.getContext("2d");
+
+    ctx.font = "28px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(text, 10, 30);
+
+    const texture = new THREE.CanvasTexture(labelCanvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    sprite.scale.set(3, 1.2, 1);
+    sprite.position.copy(position.clone().normalize().multiplyScalar(53));
+
+    return sprite;
+}
+
+// ====== FETCH ASTRONOMICAL DATA ======
 fetch("https://api.stellarium.org/api/objects")
     .then(res => res.json())
     .then(data => {
@@ -31,29 +64,33 @@ fetch("https://api.stellarium.org/api/objects")
             let color;
 
             if (obj.type === "star") {
-                color = 0xffffff; // white stars
+                color = 0xffffff;
             } else if (obj.type === "planet") {
-                color = 0xffdd00; // yellow planets
-            } else {
-                return;
-            }
+                color = 0xffdd00;
+            } else return;
 
-            const starGeometry = new THREE.SphereGeometry(0.03, 16, 16);
-            const starMaterial = new THREE.MeshBasicMaterial({ color });
-            const star = new THREE.Mesh(starGeometry, starMaterial);
+            const star = new THREE.Mesh(
+                new THREE.SphereGeometry(0.04, 16, 16),
+                new THREE.MeshBasicMaterial({ color })
+            );
 
-            // convert RA/DEC from Stellarium to 3D globe position
             const ra = obj.ra * (Math.PI / 180);
             const dec = obj.dec * (Math.PI / 180);
+            const r = 50;
 
-            const r = 50; // radius of sky sphere
-            star.position.set(
+            const pos = new THREE.Vector3(
                 r * Math.cos(dec) * Math.cos(ra),
                 r * Math.sin(dec),
                 r * Math.cos(dec) * Math.sin(ra)
             );
 
+            star.position.copy(pos);
             scene.add(star);
+
+            if (obj.name) {
+                const label = createLabel(obj.name, pos);
+                scene.add(label);
+            }
         });
     });
 
@@ -61,15 +98,14 @@ fetch("https://api.stellarium.org/api/objects")
 function animate() {
     requestAnimationFrame(animate);
 
-    // slow rotation
-    scene.rotation.y += 0.0005;
+    controls.update();
+    effect.render(scene, camera);  // <<<< اللمعان هنا
 
-    renderer.render(scene, camera);
 }
 
 animate();
 
-// ====== HANDLE WINDOW RESIZE ======
+// ====== RESIZE HANDLER ======
 window.addEventListener("resize", () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
