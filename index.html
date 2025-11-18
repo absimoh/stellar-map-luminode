@@ -8,10 +8,9 @@
 </head>
 <body>
 
-    <!-- TOP NAV BAR -->
+    <!-- NAVBAR (مخفي بالـ CSS لكن نخليه هنا لو حبّينا نرجّعه بعدين) -->
     <div id="navbar">
         <div id="logo">LUMINODE</div>
-
         <div id="nav-buttons">
             <button class="nav-btn" id="resetView">Reset View</button>
             <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
@@ -22,7 +21,7 @@
         </div>
     </div>
 
-    <!-- LEFT SIDEBAR (عبارات) -->
+    <!-- SIDEBAR يسار -->
     <div id="sidebar">
         <h2>🌌 Stellar Map</h2>
         <p>Explore stars, planets, and constellations in full 3D.</p>
@@ -35,7 +34,7 @@
         <div class="info-box">
             <h3>About</h3>
             <p>Where data, astronomy, and visualization meet in one interactive map.</p>
-            <p>Drag to rotate, scroll to zoom, and click objects to inspect them.</p>
+            <p>Drag to rotate, scroll to zoom, and search for any object by name.</p>
         </div>
 
         <div class="info-box">
@@ -46,7 +45,7 @@
         </div>
     </div>
 
-    <!-- RIGHT INFO PANEL (معلومات الجسم) -->
+    <!-- PANEL معلومات (حاليًا مخفي عن طريق CSS بس نخليه لو رجعناه لاحقًا) -->
     <div id="infoPanel">
         <h2 id="objName">Select an object</h2>
         <p id="objType"></p>
@@ -54,10 +53,10 @@
         <p id="objDEC"></p>
     </div>
 
-    <!-- SEARCH PANEL -->
+    <!-- PANEL البحث يمين -->
     <div id="searchPanel">
         <h3>🔎 Search</h3>
-        <p style="margin-top:0;">Type a name like <b>Earth</b>, <b>Mars</b>, or <b>Star 10</b>.</p>
+        <p style="margin-top:0;">Try names like <b>Earth</b>, <b>Mars</b>, <b>Jupiter</b>, or <b>Star 10</b>.</p>
 
         <input id="searchInput" type="text" placeholder="Enter object name..." />
         <button id="searchBtn" class="nav-btn" style="margin-top:8px;">Go</button>
@@ -65,15 +64,15 @@
         <p id="searchMessage"></p>
     </div>
 
-    <!-- 3D CANVAS -->
+    <!-- CANVAS -->
     <canvas id="sky"></canvas>
 
-    <!-- LIBRARIES -->
+    <!-- مكتبات 3D -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
 
-    <!-- MAIN APP -->
+    <!-- سكربت الرئيسي -->
     <script src="script.js"></script>
 </body>
 </html>
