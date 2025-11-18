@@ -3,6 +3,8 @@ body {
     overflow: hidden;
     background: #000;
     font-family: 'Arial', sans-serif;
+    background: url('https://i.imgur.com/zY3n7U8.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 /* NAVBAR */
@@ -80,3 +82,27 @@ body {
     top: 0;
     left: 0;
 }
+
+/* INFO PANEL */
+#infoPanel {
+    position: fixed;
+    right: 20px;
+    top: 80px;
+    width: 260px;
+    background: rgba(20, 20, 30, 0.7);
+    padding: 20px;
+    border-radius: 14px;
+    color: white;
+    z-index: 90;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+#infoPanel h2 {
+    margin-top: 0;
+    color: #9accff;
+}
+
+#infoPanel p {
+    margin: 5px 0;
+}
+
