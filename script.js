@@ -342,3 +342,42 @@ const mlBtn = document.getElementById("ml-predict-btn");
 if (mlBtn) {
   mlBtn.addEventListener("click", predictObjectClass);
 }
+// =======================
+//   SEARCH BY NAME
+// =======================
+
+const searchInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
+const searchMessage = document.getElementById("searchMessage");
+
+if (searchBtn && searchInput && searchMessage) {
+  searchBtn.addEventListener("click", () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) {
+      searchMessage.textContent = "Enter a name first.";
+      return;
+    }
+
+    // ابحث بالاسم (case-insensitive)
+    const found = allObjects.find(o => o.data.name.toLowerCase() === q);
+
+    if (!found) {
+      searchMessage.textContent = "No object found with that name.";
+      return;
+    }
+
+    // حرك الكاميرا ناحيته
+    const targetPos = found.mesh.position.clone().normalize().multiplyScalar(3);
+    camera.position.copy(targetPos);
+    camera.lookAt(found.mesh.position);
+
+    // حدث لوحة المعلومات
+    document.getElementById("objName").textContent = found.data.name;
+    document.getElementById("objType").textContent = "Type: " + found.data.type;
+    document.getElementById("objRA").textContent = "RA: " + found.data.ra.toFixed(3);
+    document.getElementById("objDEC").textContent = "DEC: " + found.data.dec.toFixed(3);
+
+    searchMessage.textContent = "Focused on " + found.data.name;
+  });
+}
+
