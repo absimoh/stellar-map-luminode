@@ -1,81 +1,8 @@
 body {
     margin: 0;
     overflow: hidden;
-    font-family: 'Arial', sans-serif;
-
-    /* خلفية فضائية بدون صورة خارجية */
-    background: radial-gradient(circle at top, #202442 0, #050713 40%, #000000 80%);
-}
-
-
-/* NAVBAR */
-#navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 60px;
-    background: rgba(10, 10, 20, 0.8);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 25px;
-    z-index: 100;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-#logo {
-    color: #80a9ff;
-    font-size: 26px;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.nav-btn {
-    margin-left: 10px;
-    padding: 8px 15px;
-    background: #1a2333;
-    border: 1px solid #3a4a66;
-    color: #cfe0ff;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.nav-btn:hover {
-    background: #27324a;
-}
-
-/* SIDEBAR */
-#sidebar {
-    position: fixed;
-    left: 20px;
-    top: 80px;
-    width: 240px;
-    background: rgba(15, 15, 25, 0.6);
-    padding: 20px;
-    border-radius: 14px;
-    color: white;
-    z-index: 90;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-#sidebar h2 {
-    margin-top: 0;
-    font-size: 22px;
-    color: #7eb8ff;
-}
-
-.info-box {
-    background: rgba(255,255,255,0.05);
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 15px;
-}
-
-#sidebar h3 {
-    margin: 0 0 5px;
-    font-size: 18px;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #202442, #050713, #000000);
 }
 
 #sky {
@@ -84,26 +11,66 @@ body {
     left: 0;
 }
 
-/* INFO PANEL */
-#infoPanel {
-    position: fixed;
-    right: 20px;
-    top: 80px;
+#navbar {
+    width: 100%;
+    padding: 15px;
+    background: rgba(0, 0, 20, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #6ea8ff;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#logo {
+    padding-left: 20px;
+}
+
+#nav-buttons button {
+    margin-right: 10px;
+}
+
+.nav-btn {
+    background: #1c2335;
+    border: 1px solid #2d3d5c;
+    padding: 8px 15px;
+    border-radius: 10px;
+    color: #c6d5ff;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.nav-btn:hover {
+    background: #30405c;
+}
+
+#sidebar {
+    position: absolute;
+    top: 100px;
+    left: 20px;
     width: 260px;
-    background: rgba(20, 20, 30, 0.7);
     padding: 20px;
-    border-radius: 14px;
+    background: rgba(10, 10, 20, 0.85);
+    border-radius: 20px;
     color: white;
-    z-index: 90;
-    border: 1px solid rgba(255,255,255,0.05);
 }
 
-#infoPanel h2 {
-    margin-top: 0;
-    color: #9accff;
+.info-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(50, 50, 60, 0.4);
+    border-radius: 15px;
 }
 
-#infoPanel p {
-    margin: 5px 0;
+#infoPanel {
+    position: absolute;
+    top: 120px;
+    right: 20px;
+    width: 260px;
+    padding: 20px;
+    background: rgba(10, 10, 20, 0.85);
+    border-radius: 20px;
+    color: #8bbaff;
+    font-weight: bold;
 }
-
