@@ -23,7 +23,7 @@ body {
 
 /* ===== NAVBAR (مخفي) ===== */
 #navbar {
-    display: none;              /* إخفاء الشريط العلوي */
+    display: none;              /* نخفي الشريط بالكامل */
 }
 
 /* ===== SIDEBAR (يسار) ===== */
@@ -59,9 +59,9 @@ body {
     border: 1px solid rgba(55, 65, 81, 0.7);
 }
 
-/* ===== INFO PANEL (مخفي) ===== */
+/* ===== INFO PANEL (مخفي حالياً) ===== */
 #infoPanel {
-    display: none;              /* إخفاء صندوق Select an object */
+    display: none;
 }
 
 /* ===== SEARCH PANEL (يمين) ===== */
@@ -101,7 +101,7 @@ body {
     color: #f9fafb;
 }
 
-/* زر البحث */
+/* زر بحث */
 .nav-btn {
     background: #111827;
     border: 1px solid #374151;
