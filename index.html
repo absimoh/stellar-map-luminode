@@ -8,12 +8,13 @@
 </head>
 <body>
 
+<!-- NAV -->
 <div id="navbar">
     <div id="logo">LUMINODE</div>
 
     <div id="nav-buttons">
         <button class="nav-btn" id="resetView">Reset View</button>
-        <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
+        <button class="nav-btn" id="toggleLabels">Labels</button>
         <button class="nav-btn" id="showStars">Stars</button>
         <button class="nav-btn" id="showPlanets">Planets</button>
         <button class="nav-btn" id="showAll">All</button>
@@ -21,9 +22,10 @@
     </div>
 </div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
     <h2>🌌 Stellar Map</h2>
-    <p>Explore stars, planets, and constellations in full 3D.</p>
+    <p>Explore stars and planets in complete 3D space.</p>
 
     <div class="info-box">
         <h3>Project</h3>
@@ -32,12 +34,13 @@
 
     <div class="info-box">
         <h3>Controls</h3>
-        <p>🖱️ Rotate: Drag mouse</p>
-        <p>🔍 Zoom: Scroll wheel</p>
+        <p>🖱️ Rotate: Drag</p>
+        <p>🔍 Zoom: Scroll</p>
         <p>🚀 Explore: Move freely</p>
     </div>
 </div>
 
+<!-- INFO PANEL -->
 <div id="infoPanel">
     <h2 id="objName">Select an object</h2>
     <p id="objType"></p>
@@ -45,10 +48,11 @@
     <p id="objDEC"></p>
 </div>
 
+<!-- CANVAS -->
 <canvas id="sky"></canvas>
 
-<!-- IMPORTANT: MODULE VERSION -->
-<script type="module" src="script.js"></script>
+<!-- MODULE SCRIPT -->
+<script type="module" src="./script.js"></script>
 
 </body>
 </html>
