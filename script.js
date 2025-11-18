@@ -1,8 +1,7 @@
 // =======================
-//   THREE.JS SKY SCENE
+//   THREE.JS SETUP
 // =======================
 
-// Renderer & Scene
 const canvas = document.getElementById("sky");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -10,7 +9,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
-// Camera
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -19,30 +17,30 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(0, 0, 3);
 
-// Controls
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.enablePan = false;
 
-// Outline effect
 const effect = new THREE.OutlineEffect(renderer);
 
-// Sky sphere
+// سماء خارجية
 const skyGeo = new THREE.SphereGeometry(50, 64, 64);
 const skyMat = new THREE.MeshBasicMaterial({
   color: 0x050505,
-  side: THREE.BackSide,
+  side: THREE.BackSide
 });
 scene.add(new THREE.Mesh(skyGeo, skyMat));
 
-// Lists
+// =======================
+//   OBJECTS & LABELS
+// =======================
+
 let starsList = [];
 let planetsList = [];
 let allLabels = [];
 let allObjects = [];
 
-// Create label (لو احتجناها لاحقاً)
 function createLabel(text, position) {
   const c = document.createElement("canvas");
   const ctx = c.getContext("2d");
@@ -63,7 +61,6 @@ function createLabel(text, position) {
   return sprite;
 }
 
-// Generate stars
 function generateStars() {
   const NUM = 600;
 
@@ -88,7 +85,7 @@ function generateStars() {
       new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.35
       })
     );
 
@@ -100,19 +97,18 @@ function generateStars() {
 
     allObjects.push({
       mesh: star,
-      data: { name: `Star ${i + 1}`, type: "star", ra: theta, dec: phi },
+      data: { name: `Star ${i + 1}`, type: "star", ra: theta, dec: phi }
     });
   }
 }
 
-// Generate planets
 function generatePlanets() {
   const planets = [
     { name: "Mercury", color: 0xffcc66, theta: 0.2, phi: 0.15 },
-    { name: "Venus", color: 0xffe6a3, theta: 1.0, phi: 0.05 },
-    { name: "Earth", color: 0x66aaff, theta: 1.8, phi: 0.0 },
-    { name: "Mars", color: 0xff5533, theta: 2.5, phi: -0.1 },
-    { name: "Jupiter", color: 0xffddaa, theta: 3.2, phi: 0.12 },
+    { name: "Venus",   color: 0xffe6a3, theta: 1.0, phi: 0.05 },
+    { name: "Earth",   color: 0x66aaff, theta: 1.8, phi: 0.00 },
+    { name: "Mars",    color: 0xff5533, theta: 2.5, phi: -0.10 },
+    { name: "Jupiter", color: 0xffddaa, theta: 3.2, phi: 0.12 }
   ];
 
   const r = 45;
@@ -134,7 +130,7 @@ function generatePlanets() {
       new THREE.MeshBasicMaterial({
         color: p.color,
         transparent: true,
-        opacity: 0.4,
+        opacity: 0.4
       })
     );
 
@@ -144,36 +140,17 @@ function generatePlanets() {
     scene.add(planet, glow);
     planetsList.push({ star: planet, glow });
 
-    createLabel(p.name, pos); // اسم الكوكب فوقه
+    createLabel(p.name, pos);
 
     allObjects.push({
       mesh: planet,
-      data: { name: p.name, type: "planet", ra: p.theta, dec: p.phi },
+      data: { name: p.name, type: "planet", ra: p.theta, dec: p.phi }
     });
   });
 }
 
-// Init scene
 generateStars();
 generatePlanets();
-
-// Raycaster (اختياري للنقر)
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-window.addEventListener("click", (event) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(allObjects.map((o) => o.mesh));
-
-  if (hits.length > 0) {
-    const obj = allObjects.find((o) => o.mesh === hits[0].object);
-    if (!obj) return;
-    console.log("Clicked:", obj.data.name, obj.data.type);
-  }
-});
 
 // =======================
 //   CAMERA ANIMATION
@@ -185,10 +162,9 @@ let camTo = new THREE.Vector3();
 let targetFrom = new THREE.Vector3();
 let targetTo = new THREE.Vector3();
 let camStartTime = 0;
-const CAM_DURATION = 800; // ms
+const CAM_DURATION = 900; // ms
 
 function easeInOut(t) {
-  // smoothstep تقريبًا
   return t * t * (3 - 2 * t);
 }
 
@@ -198,15 +174,19 @@ function startCameraMove(targetMesh) {
 
   camFrom.copy(camera.position);
 
-  // نخلي الكاميرا قريبة من الجسم لكن أبعد شوي عنه
+  // نخلي الكاميرا داخل الكرة (قريبة) والجسم أبعد منها
   const dir = targetMesh.position.clone().normalize();
-  camTo.copy(dir.multiplyScalar(40)); // الجسم عند ~45-50، الكاميرا عند 40
+  const camDistance = 20;        // كل ما قلّ الرقم زاد الزوم
+  camTo.copy(dir.multiplyScalar(camDistance));
 
   targetFrom.copy(controls.target);
   targetTo.copy(targetMesh.position);
 }
 
-// Animate loop
+// =======================
+//   MAIN ANIMATION LOOP
+// =======================
+
 function animate() {
   requestAnimationFrame(animate);
 
@@ -228,7 +208,6 @@ function animate() {
 }
 animate();
 
-// Resize
 window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -251,23 +230,25 @@ if (searchBtn && searchInput && searchMessage) {
       return;
     }
 
-    // ابحث بالاسم بالضبط (Earth, Mars, Jupiter, Star 10 ...)
-    const found = allObjects.find(
-      (o) => o.data.name.toLowerCase() === q
-    );
+    // نسمح بالمطابقة الكاملة أو الاحتواء (earth / Ear / star 10)
+    const found = allObjects.find((o) => {
+      const name = o.data.name.toLowerCase();
+      return name === q || name.includes(q);
+    });
 
     if (!found) {
       searchMessage.textContent = "No object found with that name.";
       return;
     }
 
-    // حرّك الكاميرا بانيميشن ناعم
+    // حرك الكاميرا + اكتب المعلومات
     startCameraMove(found.mesh);
 
-    // معلومات احترافية تحت البحث
     const ra = found.data.ra.toFixed(3);
     const dec = found.data.dec.toFixed(3);
+    const typeUpper = found.data.type.toUpperCase();
+
     searchMessage.textContent =
-      `Focused on ${found.data.name} · Type: ${found.data.type.toUpperCase()} · RA: ${ra} · DEC: ${dec}`;
+      `Focused on ${found.data.name} · Type: ${typeUpper} · RA: ${ra} · DEC: ${dec}`;
   });
 }
