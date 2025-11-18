@@ -1,8 +1,4 @@
-import * as THREE from "https://unpkg.com/three@0.152.2/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.152.2/examples/jsm/controls/OrbitControls.js";
-import { OutlineEffect } from "https://unpkg.com/three@0.152.2/examples/jsm/effects/OutlineEffect.js";
-
-// ====== SETUP ======
+// ====== SETUP RENDERER & SCENE ======
 const canvas = document.getElementById("sky");
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -18,19 +14,25 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(0, 0, 3);
 
-const controls = new OrbitControls(camera, renderer.domElement);
+// ====== ORBIT CONTROLS ======
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.dampingFactor = 0.04;
+controls.enablePan = false;
 
-const effect = new OutlineEffect(renderer);
+// ====== OUTLINE EFFECT ======
+const effect = new THREE.OutlineEffect(renderer);
 
 // ====== SKY SPHERE ======
-const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(50, 64, 64),
-    new THREE.MeshBasicMaterial({ color: 0x050505, side: THREE.BackSide })
-);
+const skyGeometry = new THREE.SphereGeometry(50, 64, 64);
+const skyMaterial = new THREE.MeshBasicMaterial({
+    color: 0x050505,
+    side: THREE.BackSide
+});
+const sky = new THREE.Mesh(skyGeometry, skyMaterial);
 scene.add(sky);
 
-// ====== OBJECT LISTS ======
+// ====== DATA LISTS ======
 let starsList = [];
 let planetsList = [];
 let allLabels = [];
@@ -38,18 +40,20 @@ let allObjects = [];
 
 // ====== LABEL CREATOR ======
 function createLabel(text, position) {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const labelCanvas = document.createElement("canvas");
+    const ctx = labelCanvas.getContext("2d");
 
     ctx.font = "28px Arial";
     ctx.fillStyle = "white";
     ctx.fillText(text, 10, 30);
 
-    const texture = new THREE.CanvasTexture(canvas);
-    const sprite = new THREE.Sprite(
-        new THREE.SpriteMaterial({ map: texture, transparent: true })
-    );
+    const texture = new THREE.CanvasTexture(labelCanvas);
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true
+    });
 
+    const sprite = new THREE.Sprite(material);
     sprite.scale.set(3, 1.2, 1);
     sprite.position.copy(position.clone().normalize().multiplyScalar(53));
 
@@ -57,11 +61,11 @@ function createLabel(text, position) {
     return sprite;
 }
 
-// ====== STARS ======
+// ====== GENERATE RANDOM STARS ======
 function generateStars() {
-    const COUNT = 600;
+    const NUM = 600;
 
-    for (let i = 0; i < COUNT; i++) {
+    for (let i = 0; i < NUM; i++) {
         const theta = Math.random() * Math.PI * 2;
         const phi = (Math.random() - 0.5) * Math.PI;
         const r = 50;
@@ -79,7 +83,11 @@ function generateStars() {
 
         const glow = new THREE.Mesh(
             new THREE.SphereGeometry(0.1, 12, 12),
-            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 })
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.35
+            })
         );
 
         star.position.copy(pos);
@@ -88,20 +96,24 @@ function generateStars() {
         scene.add(star, glow);
         starsList.push({ star, glow });
 
-        allObjects.push({
-            mesh: star,
-            data: { name: `Star ${i}`, type: "star", ra: theta, dec: phi }
-        });
+        const objData = {
+            name: `Star ${i + 1}`,
+            type: "star",
+            ra: theta,
+            dec: phi
+        };
+
+        allObjects.push({ mesh: star, data: objData });
     }
 }
 
-// ====== PLANETS ======
+// ====== GENERATE PLANETS ======
 function generatePlanets() {
     const planets = [
         { name: "Mercury", color: 0xffcc66, theta: 0.3, phi: 0.1 },
-        { name: "Venus", color: 0xffe6a3, theta: 1.0, phi: 0.05 },
-        { name: "Earth", color: 0x66aaff, theta: 1.8, phi: 0 },
-        { name: "Mars", color: 0xff5533, theta: 2.5, phi: -0.1 },
+        { name: "Venus",   color: 0xffe6a3, theta: 1.0, phi: 0.05 },
+        { name: "Earth",   color: 0x66aaff, theta: 1.8, phi: 0.0 },
+        { name: "Mars",    color: 0xff5533, theta: 2.5, phi: -0.1 },
         { name: "Jupiter", color: 0xffddaa, theta: 3.2, phi: 0.15 }
     ];
 
@@ -121,7 +133,11 @@ function generatePlanets() {
 
         const glow = new THREE.Mesh(
             new THREE.SphereGeometry(0.2, 20, 20),
-            new THREE.MeshBasicMaterial({ color: p.color, transparent: true, opacity: 0.35 })
+            new THREE.MeshBasicMaterial({
+                color: p.color,
+                transparent: true,
+                opacity: 0.35
+            })
         );
 
         planet.position.copy(pos);
@@ -144,27 +160,67 @@ function generatePlanets() {
 generateStars();
 generatePlanets();
 
-// ====== INTERACTION ======
+// ====== RAYCASTER FOR CLICKS ======
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-window.addEventListener("click", ev => {
-    mouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+window.addEventListener("click", event => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
     raycaster.setFromCamera(mouse, camera);
 
-    const hit = raycaster.intersectObjects(allObjects.map(o => o.mesh));
-    if (hit.length > 0) {
-        const found = allObjects.find(o => o.mesh === hit[0].object);
-
-        document.getElementById("objName").textContent = found.data.name;
-        document.getElementById("objType").textContent = "Type: " + found.data.type;
-        document.getElementById("objRA").textContent = "RA: " + found.data.ra.toFixed(3);
-        document.getElementById("objDEC").textContent = "DEC: " + found.data.dec.toFixed(3);
+    const hits = raycaster.intersectObjects(allObjects.map(o => o.mesh));
+    if (hits.length > 0) {
+        const obj = allObjects.find(o => o.mesh === hits[0].object);
+        if (obj) {
+            document.getElementById("objName").textContent = obj.data.name;
+            document.getElementById("objType").textContent = "Type: " + obj.data.type;
+            document.getElementById("objRA").textContent   = "RA: " + obj.data.ra.toFixed(3);
+            document.getElementById("objDEC").textContent  = "DEC: " + obj.data.dec.toFixed(3);
+        }
     }
 });
 
-// ====== ANIMATE ======
+// ====== UI BUTTONS ======
+document.getElementById("resetView").addEventListener("click", () => {
+    camera.position.set(0, 0, 3);
+    controls.reset();
+});
+
+let labelsVisible = true;
+document.getElementById("toggleLabels").addEventListener("click", () => {
+    labelsVisible = !labelsVisible;
+    allLabels.forEach(l => l.visible = labelsVisible);
+});
+
+document.getElementById("showStars").addEventListener("click", () => {
+    starsList.forEach(s => { s.star.visible = true; s.glow.visible = true; });
+    planetsList.forEach(p => { p.star.visible = false; p.glow.visible = false; });
+});
+
+document.getElementById("showPlanets").addEventListener("click", () => {
+    starsList.forEach(s => { s.star.visible = false; s.glow.visible = false; });
+    planetsList.forEach(p => { p.star.visible = true; p.glow.visible = true; });
+});
+
+document.getElementById("showAll").addEventListener("click", () => {
+    starsList.forEach(s => { s.star.visible = true; s.glow.visible = true; });
+    planetsList.forEach(p => { p.star.visible = true; p.glow.visible = true; });
+});
+
+let themeIndex = 0;
+document.getElementById("themeSwitch").addEventListener("click", () => {
+    themeIndex = (themeIndex + 1) % 3;
+    if (themeIndex === 0)
+        document.body.style.background = "radial-gradient(circle at top, #202442, #050713, #000000)";
+    if (themeIndex === 1)
+        document.body.style.background = "radial-gradient(circle at top, #111827, #020617, #000000)";
+    if (themeIndex === 2)
+        document.body.style.background = "radial-gradient(circle at top, #1f2937, #020617, #000000)";
+});
+
+// ====== ANIMATION LOOP ======
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
@@ -172,7 +228,7 @@ function animate() {
 }
 animate();
 
-// ====== RESIZE ======
+// ====== HANDLE RESIZE ======
 window.addEventListener("resize", () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
