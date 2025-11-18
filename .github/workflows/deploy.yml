@@ -1,8 +1,8 @@
-name: Deploy to GitHub Pages
+name: Ultra Fast Pages Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -16,22 +16,21 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
 
-      - name: Setup Pages
+    steps:
+      - name: Checkout (ultra fast)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1   # SUPER FAST
+
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload static site
+      - name: Upload site files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: "."  # Upload everything exactly as is
 
-      - name: Deploy
-        id: deployment
+      - name: Deploy to GitHub Pages (ultra fast)
         uses: actions/deploy-pages@v4
