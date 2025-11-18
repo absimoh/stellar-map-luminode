@@ -11,6 +11,7 @@
 <!-- TOP NAV BAR -->
 <div id="navbar">
     <div id="logo">LUMINODE</div>
+
     <div id="nav-buttons">
         <button class="nav-btn" id="resetView">Reset View</button>
         <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
@@ -35,11 +36,11 @@
         <h3>Controls</h3>
         <p>🖱️ Rotate: Drag mouse</p>
         <p>🔍 Zoom: Scroll wheel</p>
-        <p>🪐 Explore: Move freely</p>
+        <p>🚀 Explore: Move freely</p>
     </div>
 </div>
 
-<!-- INFO PANEL -->
+<!-- INFO PANEL (OBJECT DETAILS) -->
 <div id="infoPanel">
     <h2 id="objName">Select an object</h2>
     <p id="objType"></p>
@@ -47,11 +48,13 @@
     <p id="objDEC"></p>
 </div>
 
+<!-- CANVAS -->
 <canvas id="sky"></canvas>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/js/effects/OutlineEffect.js"></script>
+<!-- SCRIPTS (three.js + controls + effect + your code) -->
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/three@0.152.2/examples/js/effects/OutlineEffect.js"></script>
 <script src="script.js"></script>
 
 </body>
