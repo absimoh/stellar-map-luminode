@@ -174,9 +174,8 @@ function startCameraMove(targetMesh) {
 
   camFrom.copy(camera.position);
 
-  // نخلي الكاميرا داخل الكرة (قريبة) والجسم أبعد منها
   const dir = targetMesh.position.clone().normalize();
-  const camDistance = 20;        // كل ما قلّ الرقم زاد الزوم
+  const camDistance = 20; // صغّر الرقم لو تبي زوم أقوى
   camTo.copy(dir.multiplyScalar(camDistance));
 
   targetFrom.copy(controls.target);
@@ -215,6 +214,58 @@ window.addEventListener("resize", () => {
 });
 
 // =======================
+//   PLANET PHYSICAL INFO
+// =======================
+
+const planetInfo = {
+  Mercury: {
+    title: "Mercury – Inner Rocky Planet",
+    moons: "Moons: 0 known moons",
+    gravity: "Surface gravity ≈ 3.7 m/s²",
+    orbit: "Average distance from Sun ≈ 0.39 AU",
+    day: "Day length: ≈ 59 Earth days (slow rotation)",
+    year: "Year length: ≈ 88 Earth days",
+    note: "Small, airless, heavily cratered world and the closest planet to the Sun."
+  },
+  Venus: {
+    title: "Venus – Earth’s Hot Twin",
+    moons: "Moons: 0 known moons",
+    gravity: "Surface gravity ≈ 8.9 m/s²",
+    orbit: "Average distance from Sun ≈ 0.72 AU",
+    day: "Day length: ≈ 243 Earth days (retrograde rotation)",
+    year: "Year length: ≈ 225 Earth days",
+    note: "Thick CO₂ atmosphere, extreme greenhouse effect, and very high surface temperature."
+  },
+  Earth: {
+    title: "Earth – Our Home World",
+    moons: "Moons: 1 natural moon",
+    gravity: "Surface gravity ≈ 9.8 m/s²",
+    orbit: "Average distance from Sun ≈ 1.00 AU",
+    day: "Day length: 24 hours",
+    year: "Year length: ≈ 365 days",
+    note: "Only known planet with surface liquid water and complex life."
+  },
+  Mars: {
+    title: "Mars – The Red Planet",
+    moons: "Moons: 2 small moons (Phobos & Deimos)",
+    gravity: "Surface gravity ≈ 3.7 m/s²",
+    orbit: "Average distance from Sun ≈ 1.52 AU",
+    day: "Day length: ≈ 24.6 Earth hours (one sol)",
+    year: "Year length: ≈ 687 Earth days",
+    note: "Cold desert world with polar ice caps and evidence of ancient rivers and lakes."
+  },
+  Jupiter: {
+    title: "Jupiter – Giant of the Solar System",
+    moons: "Moons: ≈95 known moons",
+    gravity: "Cloud-top gravity ≈ 24.8 m/s²",
+    orbit: "Average distance from Sun ≈ 5.20 AU",
+    day: "Day length: ≈ 10 Earth hours (very fast rotation)",
+    year: "Year length: ≈ 11.9 Earth years",
+    note: "Massive gas giant with a strong magnetic field and the famous Great Red Spot storm."
+  }
+};
+
+// =======================
 //   SEARCH BY NAME
 // =======================
 
@@ -226,11 +277,10 @@ if (searchBtn && searchInput && searchMessage) {
   searchBtn.addEventListener("click", () => {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) {
-      searchMessage.textContent = "Enter a name first.";
+      searchMessage.textContent = "Enter a name first (e.g., Earth, Mars, Jupiter, Star 10).";
       return;
     }
 
-    // نسمح بالمطابقة الكاملة أو الاحتواء (earth / Ear / star 10)
     const found = allObjects.find((o) => {
       const name = o.data.name.toLowerCase();
       return name === q || name.includes(q);
@@ -241,14 +291,38 @@ if (searchBtn && searchInput && searchMessage) {
       return;
     }
 
-    // حرك الكاميرا + اكتب المعلومات
+    // حرّك الكاميرا إلى الجسم
     startCameraMove(found.mesh);
 
     const ra = found.data.ra.toFixed(3);
     const dec = found.data.dec.toFixed(3);
     const typeUpper = found.data.type.toUpperCase();
+    const objName = found.data.name;
 
-    searchMessage.textContent =
-      `Focused on ${found.data.name} · Type: ${typeUpper} · RA: ${ra} · DEC: ${dec}`;
+    const info = planetInfo[objName];
+
+    // لو كوكب وله بيانات
+    if (found.data.type === "planet" && info) {
+      searchMessage.innerHTML = `
+        <strong>${info.title}</strong><br>
+        Name: ${objName}<br>
+        Type: ${typeUpper}<br>
+        RA: ${ra} · DEC: ${dec}<br>
+        ${info.moons}<br>
+        ${info.gravity}<br>
+        Orbit: ${info.orbit}<br>
+        ${info.day}<br>
+        ${info.year}<br>
+        Notes: ${info.note}
+      `;
+    } else {
+      // نجوم أو أشياء ما عندها جدول معلومات
+      searchMessage.innerHTML = `
+        <strong>${objName}</strong><br>
+        Type: ${typeUpper}<br>
+        RA: ${ra} · DEC: ${dec}<br>
+        No detailed physical data available for this object.
+      `;
+    }
   });
 }
