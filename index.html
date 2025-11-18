@@ -8,12 +8,13 @@
 </head>
 <body>
 
-    <!-- NAVBAR (مخفي بالـ CSS لكن نخليه هنا لو حبّينا نرجّعه بعدين) -->
+    <!-- TOP NAV BAR -->
     <div id="navbar">
         <div id="logo">LUMINODE</div>
+
         <div id="nav-buttons">
             <button class="nav-btn" id="resetView">Reset View</button>
-            <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
+            <button class="nav-btn" id="toggleLabels">Labels</button>
             <button class="nav-btn" id="showStars">Stars</button>
             <button class="nav-btn" id="showPlanets">Planets</button>
             <button class="nav-btn" id="showAll">All</button>
@@ -21,58 +22,62 @@
         </div>
     </div>
 
-    <!-- SIDEBAR يسار -->
+    <!-- LEFT SIDEBAR -->
     <div id="sidebar">
         <h2>🌌 Stellar Map</h2>
-        <p>Explore stars, planets, and constellations in full 3D.</p>
+        <p>Explore an interactive 3D view of stars and planets around you in a virtual celestial sphere.</p>
 
         <div class="info-box">
             <h3>Project</h3>
-            <p>LUMINODE | Stellar 3D Mapping</p>
+            <p>LUMINODE | Stellar 3D Mapping & Data Exploration.</p>
         </div>
 
         <div class="info-box">
             <h3>About</h3>
-            <p>Where data, astronomy, and visualization meet in one interactive map.</p>
-            <p>Drag to rotate, scroll to zoom, and search for any object by name.</p>
+            <p>This prototype blends astronomy & visualization to help users navigate the sky, inspect objects, and read curated facts about each planet.</p>
         </div>
 
         <div class="info-box">
             <h3>Controls</h3>
-            <p>🖱 Rotate: Drag mouse</p>
-            <p>🔍 Zoom: Scroll wheel</p>
-            <p>🚀 Explore: Move freely</p>
+            <p>🖱 <b>Rotate:</b> Click & drag</p>
+            <p>🔍 <b>Zoom:</b> Mouse scroll</p>
+            <p>🚀 <b>Explore:</b> Use filters & search to focus on objects</p>
         </div>
     </div>
 
-    <!-- PANEL معلومات (حاليًا مخفي عن طريق CSS بس نخليه لو رجعناه لاحقًا) -->
-    <div id="infoPanel">
-        <h2 id="objName">Select an object</h2>
-        <p id="objType"></p>
-        <p id="objRA"></p>
-        <p id="objDEC"></p>
+    <!-- RIGHT COLUMN (INFO + SEARCH) -->
+    <div id="rightColumn">
+        <!-- OBJECT INFO PANEL (updates on click/search) -->
+        <div id="infoPanel">
+            <h2 id="objName">No object selected</h2>
+            <p id="objType">Type: —</p>
+            <p id="objRA">RA: —</p>
+            <p id="objDEC">DEC: —</p>
+        </div>
+
+        <!-- SEARCH PANEL -->
+        <div id="searchPanel">
+            <h3>🔎 Search Object</h3>
+            <p class="hint">
+                Try names like <b>Earth</b>, <b>Mars</b>, <b>Jupiter</b> or <b>Star 10</b>.
+            </p>
+
+            <input id="searchInput" type="text" placeholder="Enter object name..." />
+            <button id="searchBtn" class="nav-btn search-btn">Go</button>
+
+            <div id="searchMessage"></div>
+        </div>
     </div>
 
-    <!-- PANEL البحث يمين -->
-    <div id="searchPanel">
-        <h3>🔎 Search</h3>
-        <p style="margin-top:0;">Try names like <b>Earth</b>, <b>Mars</b>, <b>Jupiter</b>, or <b>Star 10</b>.</p>
-
-        <input id="searchInput" type="text" placeholder="Enter object name..." />
-        <button id="searchBtn" class="nav-btn" style="margin-top:8px;">Go</button>
-
-        <p id="searchMessage"></p>
-    </div>
-
-    <!-- CANVAS -->
+    <!-- 3D CANVAS -->
     <canvas id="sky"></canvas>
 
-    <!-- مكتبات 3D -->
+    <!-- THREE.JS LIBRARIES -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
 
-    <!-- سكربت الرئيسي -->
+    <!-- MAIN SCRIPT -->
     <script src="script.js"></script>
 </body>
 </html>
