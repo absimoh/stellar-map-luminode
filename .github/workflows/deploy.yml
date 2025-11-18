@@ -19,10 +19,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout (ultra fast)
-        uses: actions/checkout@v4
+      - name: Checkout (stable + auto retry)
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 1   # SUPER FAST
+          fetch-depth: 2
+          retry: 3
+          retry_wait_seconds: 5
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
@@ -30,7 +32,7 @@ jobs:
       - name: Upload site files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."  # Upload everything exactly as is
+          path: "."
 
       - name: Deploy to GitHub Pages (ultra fast)
         uses: actions/deploy-pages@v4
