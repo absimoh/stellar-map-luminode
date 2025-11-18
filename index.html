@@ -22,10 +22,10 @@
         </div>
     </div>
 
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT SIDEBAR (عبارات) -->
     <div id="sidebar">
         <h2>🌌 Stellar Map</h2>
-        <p>Explore stars and planets in complete 3D space.</p>
+        <p>Explore stars, planets, and constellations in full 3D.</p>
 
         <div class="info-box">
             <h3>Project</h3>
@@ -33,14 +33,20 @@
         </div>
 
         <div class="info-box">
+            <h3>About</h3>
+            <p>Where data, astronomy, and visualization meet in one interactive map.</p>
+            <p>Drag to rotate, scroll to zoom, and click objects to inspect them.</p>
+        </div>
+
+        <div class="info-box">
             <h3>Controls</h3>
-            <p>🖱️ Rotate: Drag</p>
+            <p>🖱 Rotate: Drag mouse</p>
             <p>🔍 Zoom: Scroll wheel</p>
             <p>🚀 Explore: Move freely</p>
         </div>
     </div>
 
-    <!-- RIGHT INFO PANEL -->
+    <!-- RIGHT INFO PANEL (معلومات الجسم) -->
     <div id="infoPanel">
         <h2 id="objName">Select an object</h2>
         <p id="objType"></p>
@@ -48,41 +54,24 @@
         <p id="objDEC"></p>
     </div>
 
-    <!-- ML PANEL -->
-    <div id="mlPanel">
-        <h2>🧠 ML – Object Predictor</h2>
-        <p>Simple demo that guesses whether it’s a Star, Planet, or Galaxy.</p>
+    <!-- SEARCH PANEL -->
+    <div id="searchPanel">
+        <h3>🔎 Search</h3>
+        <p style="margin-top:0;">Type a name like <b>Earth</b>, <b>Mars</b>, or <b>Star 10</b>.</p>
 
-        <label>
-            Brightness (mag)<br />
-            <input id="ml-brightness" type="number" step="0.1" value="3" />
-        </label><br /><br />
+        <input id="searchInput" type="text" placeholder="Enter object name..." />
+        <button id="searchBtn" class="nav-btn" style="margin-top:8px;">Go</button>
 
-        <label>
-            Distance (light years)<br />
-            <input id="ml-distance" type="number" step="1" value="50" />
-        </label><br /><br />
-
-        <label>
-            Color Index (B-V)<br />
-            <input id="ml-color" type="number" step="0.1" value="0.5" />
-        </label><br /><br />
-
-        <button id="ml-predict-btn" class="nav-btn">Predict Class</button>
-
-        <p id="ml-output"></p>
+        <p id="searchMessage"></p>
     </div>
 
     <!-- 3D CANVAS -->
     <canvas id="sky"></canvas>
 
-    <!-- LIBRARIES (بدون imports / modules) -->
+    <!-- LIBRARIES -->
     <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
-
-    <!-- TensorFlow.js for ML demo -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 
     <!-- MAIN APP -->
     <script src="script.js"></script>
