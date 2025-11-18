@@ -1,63 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LUMINODE Stellar Map</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- NAV -->
-<div id="navbar">
-    <div id="logo">LUMINODE</div>
+    <!-- TOP NAV BAR -->
+    <div id="navbar">
+        <div id="logo">LUMINODE</div>
 
-    <div id="nav-buttons">
-        <button class="nav-btn" id="resetView">Reset View</button>
-        <button class="nav-btn" id="toggleLabels">Labels</button>
-        <button class="nav-btn" id="showStars">Stars</button>
-        <button class="nav-btn" id="showPlanets">Planets</button>
-        <button class="nav-btn" id="showAll">All</button>
-        <button class="nav-btn" id="themeSwitch">Theme</button>
-    </div>
-</div>
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-    <h2>🌌 Stellar Map</h2>
-    <p>Explore stars and planets in complete 3D space.</p>
-
-    <div class="info-box">
-        <h3>Project</h3>
-        <p>LUMINODE | Stellar 3D Mapping</p>
+        <div id="nav-buttons">
+            <button class="nav-btn" id="resetView">Reset View</button>
+            <button class="nav-btn" id="toggleLabels">Toggle Labels</button>
+            <button class="nav-btn" id="showStars">Stars</button>
+            <button class="nav-btn" id="showPlanets">Planets</button>
+            <button class="nav-btn" id="showAll">All</button>
+            <button class="nav-btn" id="themeSwitch">Theme</button>
+        </div>
     </div>
 
-    <div class="info-box">
-        <h3>Controls</h3>
-        <p>🖱️ Rotate: Drag</p>
-        <p>🔍 Zoom: Scroll</p>
-        <p>🚀 Explore: Move freely</p>
+    <!-- LEFT SIDEBAR -->
+    <div id="sidebar">
+        <h2>🌌 Stellar Map</h2>
+        <p>Explore stars and planets in complete 3D space.</p>
+
+        <div class="info-box">
+            <h3>Project</h3>
+            <p>LUMINODE | Stellar 3D Mapping</p>
+        </div>
+
+        <div class="info-box">
+            <h3>Controls</h3>
+            <p>🖱️ Rotate: Drag</p>
+            <p>🔍 Zoom: Scroll wheel</p>
+            <p>🚀 Explore: Move freely</p>
+        </div>
     </div>
-</div>
 
-<!-- INFO PANEL -->
-<div id="infoPanel">
-    <h2 id="objName">Select an object</h2>
-    <p id="objType"></p>
-    <p id="objRA"></p>
-    <p id="objDEC"></p>
-</div>
+    <!-- RIGHT INFO PANEL -->
+    <div id="infoPanel">
+        <h2 id="objName">Select an object</h2>
+        <p id="objType"></p>
+        <p id="objRA"></p>
+        <p id="objDEC"></p>
+    </div>
 
-<!-- CANVAS -->
-<canvas id="sky"></canvas>
+    <!-- ML PANEL -->
+    <div id="mlPanel">
+        <h2>🧠 ML – Object Predictor</h2>
+        <p>Simple demo that guesses whether it’s a Star, Planet, or Galaxy.</p>
 
-<!-- THREE.js without Modules -->
-<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
+        <label>
+            Brightness (mag)<br />
+            <input id="ml-brightness" type="number" step="0.1" value="3" />
+        </label><br /><br />
 
-<!-- MAIN SCRIPT -->
-<script src="script.js"></script>
+        <label>
+            Distance (light years)<br />
+            <input id="ml-distance" type="number" step="1" value="50" />
+        </label><br /><br />
 
+        <label>
+            Color Index (B-V)<br />
+            <input id="ml-color" type="number" step="0.1" value="0.5" />
+        </label><br /><br />
+
+        <button id="ml-predict-btn" class="nav-btn">Predict Class</button>
+
+        <p id="ml-output"></p>
+    </div>
+
+    <!-- 3D CANVAS -->
+    <canvas id="sky"></canvas>
+
+    <!-- LIBRARIES (بدون imports / modules) -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
+
+    <!-- TensorFlow.js for ML demo -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+
+    <!-- MAIN APP -->
+    <script src="script.js"></script>
 </body>
 </html>
