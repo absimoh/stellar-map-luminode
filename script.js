@@ -32,6 +32,48 @@ const skyMat = new THREE.MeshBasicMaterial({
   side: THREE.BackSide
 });
 scene.add(new THREE.Mesh(skyGeo, skyMat));
+// =======================
+//   REAL EARTH MODEL
+// =======================
+
+function createEarth() {
+  const loader = new THREE.TextureLoader();
+
+  const earthTexture = loader.load("D:/download/code/luminod/pictures/earth/2k_earth_daymap.jpg");
+  const earthNormal  = loader.load("D:/download/code/luminod/pictures/earth/1-bluemarble_west.jpg");
+  const earthSpecular= loader.load("D:/download/code/luminod/pictures/earth/2k_nightmap.jpg");
+
+  const geometry = new THREE.SphereGeometry(1.2, 64, 64);
+
+  const material = new THREE.MeshPhongMaterial({
+    map: earthTexture,
+    normalMap: earthNormal,
+    specularMap: earthSpecular,
+    shininess: 15
+  });
+
+  const earth = new THREE.Mesh(geometry, material);
+  return earth;
+}
+
+function createEarthClouds() {
+  const loader = new THREE.TextureLoader();
+  const cloudTexture = loader.load("./pictures/earth/2k_earth_clouds.jpg");
+
+  const geometry = new THREE.SphereGeometry(1.205, 64, 64);
+
+  const material = new THREE.MeshPhongMaterial({
+    map: cloudTexture,
+    transparent: true,
+    opacity: 0.5,
+    depthWrite: false
+  });
+
+  const clouds = new THREE.Mesh(geometry, material);
+  return clouds;
+}
+
+
 
 // =======================
 //   OBJECTS & LABELS
@@ -46,7 +88,11 @@ function createLabel(text, position) {
   const c = document.createElement("canvas");
   const ctx = c.getContext("2d");
 
-  ctx.font = "28px Arial";
+  c.width = 300;
+  c.height = 120;
+  ctx.font = "48px Arial";
+  ctx.fillText(text, 20, 60);
+
   ctx.fillStyle = "white";
   ctx.fillText(text, 10, 30);
 
@@ -102,16 +148,19 @@ function generateStars() {
     });
   }
 }
-
 function generatePlanets() {
+  const loader = new THREE.TextureLoader();
+
   const planets = [
-    { name: "Mercury", color: 0xffcc66, theta: 0.2, phi: 0.15 },
-    { name: "Venus",   color: 0xffe6a3, theta: 1.0, phi: 0.05 },
-    { name: "Earth",   color: 0x66aaff, theta: 1.8, phi: 0.00 },
-    { name: "Mars",    color: 0xff5533, theta: 2.5, phi: -0.10 },
-    { name: "Jupiter", color: 0xffddaa, theta: 3.2, phi: 0.12 }
+    { name: "Mercury", texture: "textures/mercury.jpg", size: 3.08, theta: 0.2, phi: 0.15 },
+    { name: "Venus",   texture: "textures/venus.jpg",   size: 3.68, theta: 1.0, phi: 0.05 },
+    { name: "Earth",   texture: "textures/earth_day.jpg", size: 4,    theta: 1.8, phi: 0.00 },
+    { name: "Mars",    texture: "textures/mars.jpg",     size: 3.40, theta: 2.5, phi: -0.10 },
+    { name: "Jupiter", texture: "textures/jupiter.jpg",  size: 7.68, theta: 3.2, phi: 0.12 }
   ];
 
+
+  
   const r = 45;
 
   planets.forEach((p) => {
@@ -121,24 +170,28 @@ function generatePlanets() {
       r * Math.cos(p.phi) * Math.sin(p.theta)
     );
 
-    const planet = new THREE.Mesh(
-      new THREE.SphereGeometry(0.12, 20, 20),
-      new THREE.MeshBasicMaterial({ color: p.color })
-    );
+    const texture = loader.load(p.texture);
 
-    const glow = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 20, 20),
-      new THREE.MeshBasicMaterial({
-        color: p.color,
-        transparent: true,
-        opacity: 0.4
-      })
+    const planet = new THREE.Mesh(
+      new THREE.SphereGeometry(p.size, 32, 32),
+      new THREE.MeshStandardMaterial({ map: texture })
     );
 
     planet.position.copy(pos);
-    glow.position.copy(pos);
+    scene.add(planet);
 
-    scene.add(planet, glow);
+    // Glow (optional)
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(p.size + 0.05, 20, 20),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.15
+      })
+    );
+    glow.position.copy(pos);
+    scene.add(glow);
+
     planetsList.push({ star: planet, glow });
 
     createLabel(p.name, pos);
@@ -150,8 +203,10 @@ function generatePlanets() {
   });
 }
 
+
 generateStars();
 generatePlanets();
+
 
 // =======================
 //   CAMERA ANIMATION
