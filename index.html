@@ -1,84 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LUMINODE Stellar Map</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Stellar Map Luminode</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; }
+    canvas { display: block; }
+    #label {
+      position: absolute;
+      color: #fff;
+      padding: 4px 8px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 5px;
+      font-family: Arial;
+      font-size: 13px;
+      pointer-events: none;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-
-    <!-- TOP NAV BAR -->
-    <div id="navbar">
-        <div id="logo">LUMINODE</div>
-
-        <div id="nav-buttons">
-            <button class="nav-btn" id="resetView">Reset View</button>
-            <button class="nav-btn" id="toggleLabels">Labels</button>
-            <button class="nav-btn" id="showStars">Stars</button>
-            <button class="nav-btn" id="showPlanets">Planets</button>
-            <button class="nav-btn" id="showAll">All</button>
-            <button class="nav-btn" id="themeSwitch">Theme</button>
-        </div>
-    </div>
-
-    <!-- LEFT SIDEBAR -->
-    <div id="sidebar">
-        <h2>🌌 Stellar Map</h2>
-        <p>Explore an interactive 3D view of stars and planets around you in a virtual celestial sphere.</p>
-
-        <div class="info-box">
-            <h3>Project</h3>
-            <p>LUMINODE | Stellar 3D Mapping & Data Exploration.</p>
-        </div>
-
-        <div class="info-box">
-            <h3>About</h3>
-            <p>This prototype blends astronomy & visualization to help users navigate the sky, inspect objects, and read curated facts about each planet.</p>
-        </div>
-
-        <div class="info-box">
-            <h3>Controls</h3>
-            <p>🖱 <b>Rotate:</b> Click & drag</p>
-            <p>🔍 <b>Zoom:</b> Mouse scroll</p>
-            <p>🚀 <b>Explore:</b> Use filters & search to focus on objects</p>
-        </div>
-    </div>
-
-    <!-- RIGHT COLUMN (INFO + SEARCH) -->
-    <div id="rightColumn">
-        <!-- OBJECT INFO PANEL (updates on click/search) -->
-        <div id="infoPanel">
-            <h2 id="objName">No object selected</h2>
-            <p id="objType">Type: —</p>
-            <p id="objRA">RA: —</p>
-            <p id="objDEC">DEC: —</p>
-        </div>
-
-        <!-- SEARCH PANEL -->
-        <div id="searchPanel">
-            <h3>🔎 Search Object</h3>
-            <p class="hint">
-                Try names like <b>Earth</b>, <b>Mars</b>, <b>Jupiter</b> or <b>Star 10</b>.
-            </p>
-
-            <input id="searchInput" type="text" placeholder="Enter object name..." />
-            <button id="searchBtn" class="nav-btn search-btn">Go</button>
-
-            <div id="searchMessage"></div>
-        </div>
-    </div>
-
-    <!-- 3D CANVAS -->
-    <canvas id="sky"></canvas>
-
-    <!-- THREE.JS LIBRARIES -->
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/effects/OutlineEffect.js"></script>
-
-    <!-- MAIN SCRIPT -->
-    <script src="script.js"></script>
+  <div id="label"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
