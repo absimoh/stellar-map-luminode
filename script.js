@@ -130,4 +130,19 @@ window.addEventListener("click", (e) => {
 function animate() {
   planets.forEach(p => {
     p.mesh.position.x = Math.cos(Date.now() * p.speed * 0.001) * p.dist;
-    p.mesh.position.z = Math.sin(Date.
+    p.mesh.position.z = Math.sin(Date.now() * p.speed * 0.001) * p.dist;
+  });
+
+  controls.update();
+  composer.render();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ===================== RESIZE ======================
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+});
