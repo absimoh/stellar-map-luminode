@@ -36,7 +36,6 @@ body {
   margin-bottom: 4px;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .panel {
     width: 180px;
