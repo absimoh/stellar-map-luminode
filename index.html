@@ -1,34 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Stellar Map Luminode</title>
-  <style>
-    body { margin: 0; overflow: hidden; background: #000; }
-    canvas { display: block; }
-    #label {
-      position: absolute;
-      color: #fff;
-      padding: 4px 8px;
-      background: rgba(0,0,0,0.6);
-      border-radius: 5px;
-      font-family: Arial;
-      font-size: 13px;
-      pointer-events: none;
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMINODE Stellar Map</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="label"></div>
+<div id="infoPanel" class="panel"></div>
 
-  <!-- مكتبة Three.js مضمونة على GitHub Pages -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<canvas id="bg"></canvas>
 
-  <!-- ملف السكربت الخاص بنا -->
-  <script src="script.js"></script>
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
-
