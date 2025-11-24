@@ -58,15 +58,32 @@ composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window
 
 // ==================== PLANETS ======================
 const planetsData = [
-  { name: "Mercury", size: 2, dist: 20, speed: 0.018, texture: "mercury.jpg" },
-  { name: "Venus", size: 3.5, dist: 30, speed: 0.014, texture: "venus.jpg" },
-  { name: "Earth", size: 4, dist: 40, speed: 0.011, texture: "earth.jpg" },
-  { name: "Mars", size: 3, dist: 50, speed: 0.009, texture: "mars.jpg" },
-  { name: "Jupiter", size: 8, dist: 70, speed: 0.007, texture: "jupiter.jpg" },
-  { name: "Saturn", size: 7, dist: 90, speed: 0.005, texture: "saturn.jpg" },
-  { name: "Uranus", size: 5, dist: 110, speed: 0.0035, texture: "uranus.jpg" },
-  { name: "Neptune", size: 5, dist: 130, speed: 0.0025, texture: "neptune.jpg" }
+  { name:"Mercury", size:2, dist:20, speed:0.018, texture:"mercury.jpg" },
+  { name:"Venus", size:3.5, dist:30, speed:0.014, texture:"venus.jpg" },
+  { 
+    name:"Earth", size:4, dist:40, speed:0.011, texture:"earth.jpg",
+    moons: [
+      { name:"Moon", size:0.8, dist:6, speed:0.03, texture:"moon.jpg" }
+    ]
+  },
+  { name:"Mars", size:3, dist:50, speed:0.009, texture:"mars.jpg" },
+  { 
+    name:"Jupiter", size:8, dist:70, speed:0.007, texture:"jupiter.jpg",
+    moons: [
+      { name:"Io", size:0.9, dist:10, speed:0.018, texture:"moon.jpg" },
+      { name:"Europa", size:0.9, dist:12, speed:0.016, texture:"moon.jpg" }
+    ]
+  },
+  { 
+    name:"Saturn", size:7, dist:90, speed:0.005, texture:"saturn.jpg",
+    moons: [
+      { name:"Titan", size:1.2, dist:9, speed:0.02, texture:"moon.jpg" }
+    ]
+  },
+  { name:"Uranus", size:5, dist:110, speed:0.0035, texture:"uranus.jpg" },
+  { name:"Neptune", size:5, dist:130, speed:0.0025, texture:"neptune.jpg" }
 ];
+
 
 const planets = [];
 
