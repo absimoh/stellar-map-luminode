@@ -1,128 +1,133 @@
+// ================= IMPORTS (GitHub-safe CDN) =====================
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/controls/OrbitControls.js";
+import { UnrealBloomPass } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/postprocessing/RenderPass.js";
 
+// ==================== SCENE / CAMERA / RENDERER ====================
 const canvas = document.getElementById("bg");
-
-// 🎯 ـ المشهد + الكاميرا + الرندر
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 2000);
-camera.position.set(0, 60, 200);
 
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(0, 65, 200);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// 🎮 تتحكم بالكاميرا (الحركة + الزوم + الدوران)
+// ==================== ORBIT CONTROLS ==============================
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.1;
-controls.enableZoom = true;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.4;
-controls.minDistance = 20;
-controls.maxDistance = 500;
+controls.autoRotateSpeed = 0.7;
+controls.enableZoom = true;
 
-// 💡 إضاءة الكواكب و النجوم
+// ==================== LIGHTS ======================
 scene.add(new THREE.AmbientLight(0xffffff, 0.2));
-const sunLight = new THREE.PointLight(0xffffff, 3);
+const sunLight = new THREE.PointLight(0xffffff, 4);
 scene.add(sunLight);
 
-// 🪐 تحميل خامات (texture) للكواكب
+// ==================== TEXTURES =====================
 const loader = new THREE.TextureLoader();
 
-// 🟡 الشمس
+// ==================== SUN + GLOW =====================
+const sunTexture = loader.load("img/sun.jpg");
 const sun = new THREE.Mesh(
-  new THREE.SphereGeometry(12,32,32),
-  new THREE.MeshBasicMaterial({ map: loader.load('img/sun.jpg') })
+  new THREE.SphereGeometry(12, 64, 64),
+  new THREE.MeshBasicMaterial({ map: sunTexture })
 );
 scene.add(sun);
 
-// 📌 بيانات الكواكب
+// Halo (glow plane)
+const sunGlow = new THREE.Sprite(
+  new THREE.SpriteMaterial({
+    map: loader.load("img/glow.png"),
+    color: 0xffd000,
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  })
+);
+sunGlow.scale.set(70, 70, 1);
+scene.add(sunGlow);
+
+// =================== BLOOM EFFECT ===================
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0));
+
+// ==================== PLANETS ======================
 const planetsData = [
-  { name:"Mercury", size:2, dist:20, speed:0.02, texture:"mercury.jpg" },
-  { name:"Venus", size:4, dist:30, speed:0.015, texture:"venus.jpg" },
-  { name:"Earth", size:4.3, dist:40, speed:0.01, texture:"earth.jpg" },
-  { name:"Mars", size:3, dist:48, speed:0.008, texture:"mars.jpg" },
-  { name:"Jupiter", size:8, dist:70, speed:0.006, texture:"jupiter.jpg" },
-  { name:"Saturn", size:7, dist:90, speed:0.004, texture:"saturn.jpg" },
-  { name:"Uranus", size:5, dist:110, speed:0.003, texture:"uranus.jpg" },
-  { name:"Neptune", size:5, dist:130, speed:0.002, texture:"neptune.jpg" }
+  { name: "Mercury", size: 2, dist: 20, speed: 0.018, texture: "mercury.jpg" },
+  { name: "Venus", size: 3.5, dist: 30, speed: 0.014, texture: "venus.jpg" },
+  { name: "Earth", size: 4, dist: 40, speed: 0.011, texture: "earth.jpg" },
+  { name: "Mars", size: 3, dist: 50, speed: 0.009, texture: "mars.jpg" },
+  { name: "Jupiter", size: 8, dist: 70, speed: 0.007, texture: "jupiter.jpg" },
+  { name: "Saturn", size: 7, dist: 90, speed: 0.005, texture: "saturn.jpg" },
+  { name: "Uranus", size: 5, dist: 110, speed: 0.0035, texture: "uranus.jpg" },
+  { name: "Neptune", size: 5, dist: 130, speed: 0.0025, texture: "neptune.jpg" }
 ];
 
 const planets = [];
 
-// 🔁 إنشاء الكواكب + المدارات
-planetsData.forEach(data=>{
-  const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(data.size,32,32),
+planetsData.forEach(data => {
+  const planet = new THREE.Mesh(
+    new THREE.SphereGeometry(data.size, 32, 32),
     new THREE.MeshStandardMaterial({ map: loader.load("img/" + data.texture) })
   );
-  mesh.userData = {
+
+  planet.userData = {
     name: data.name,
     orbitalRadius: data.dist,
-    orbitalPeriod: (1/data.speed).toFixed(0)+" days",
-    description: `${data.name} planet in our Solar System.`
+    description: `${data.name}: Planet in the Solar System`
   };
-  scene.add(mesh);
 
-  planets.push({mesh, ...data});
+  scene.add(planet);
+  planets.push({ mesh: planet, ...data });
 
-  // 🌀 رسم المدار
-  const curve = new THREE.EllipseCurve(
-    0,0, data.dist, data.dist, 0, 2*Math.PI, false, 0
+  // HALO for planets
+  const halo = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: loader.load("img/glow.png"),
+      color: 0x88cfff,
+      blending: THREE.AdditiveBlending,
+      transparent: true
+    })
   );
-  const pts = curve.getPoints(128);
-  const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const orbit = new THREE.Line(geo, new THREE.LineBasicMaterial({color:0x666666}));
-  orbit.rotation.x = Math.PI/2;
-  scene.add(orbit);
+  halo.scale.set(data.size * 4, data.size * 4, 1);
+  planet.add(halo);
+
+  // Orbit Line
+  const curve = new THREE.EllipseCurve(0, 0, data.dist, data.dist);
+  const points = curve.getPoints(128);
+  const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
+  const orbitMat = new THREE.LineBasicMaterial({ color: 0x888888 });
+  const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+  orbitLine.rotation.x = Math.PI / 2;
+  scene.add(orbitLine);
 });
 
-// 🎯 Raycaster لاختيار الكوكب
+// ==================== RAYCASTER (INFO PANEL) =====================
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const panel = document.getElementById("infoPanel");
 
-window.addEventListener('click', (e)=>{
+window.addEventListener("click", (e) => {
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
-
-  const intersects = raycaster.intersectObjects(scene.children, true);
-  if(intersects.length > 0){
-    const obj = intersects[0].object;
-    if(obj.userData.name){
-      showPanel(obj.userData);
-    }
+  const hit = raycaster.intersectObjects(scene.children, true);
+  if (hit.length > 0 && hit[0].object.userData.name) {
+    const d = hit[0].object.userData;
+    panel.style.display = "block";
+    panel.innerHTML = `<h3>${d.name}</h3>
+    <p><b>Orbit:</b> ${d.orbitalRadius}</p>
+    <p>${d.description}</p>`;
   }
 });
 
-// 📌 عرض لوحة المعلومات
-function showPanel(data){
-  panel.style.display = "block";
-  panel.innerHTML = `
-    <h3>${data.name}</h3>
-    <p><b>Orbit Radius:</b> ${data.orbitalRadius}</p>
-    <p><b>Orbit Period:</b> ${data.orbitalPeriod}</p>
-    <p>${data.description}</p>
-  `;
-}
-
-// 🔁 الرسوم المتحركة
-function animate(){
-  requestAnimationFrame(animate);
-  planets.forEach(p=>{
-    p.mesh.position.x = Math.cos(Date.now()*p.speed*0.001)*p.dist;
-    p.mesh.position.z = Math.sin(Date.now()*p.speed*0.001)*p.dist;
-  });
-  controls.update();
-  renderer.render(scene,camera);
-}
-animate();
-
-// 📱 استجابة الشاشات
-window.addEventListener('resize', ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+// ==================== ANIMATION LOOP =====================
+function animate() {
+  planets.forEach(p => {
+    p.mesh.position.x = Math.cos(Date.now() * p.speed * 0.001) * p.dist;
+    p.mesh.position.z = Math.sin(Date.
