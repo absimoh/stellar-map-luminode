@@ -1,47 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LUMINODE – 3D Solar System</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="ui">
-    <div id="sidebar">
-      <h1>LUMINODE</h1>
-      <h2>Solar System</h2>
-
-      <div class="section">
-        <h3>Planets</h3>
-        <ul id="planetList"></ul>
-      </div>
-
-      <div class="section">
-        <h3>Time Control</h3>
-        <label for="timeRange">Speed</label>
-        <input id="timeRange" type="range" min="0" max="5" step="0.1" value="1" />
-        <div class="time-label">
-          <span>Pause</span>
-          <span>Normal</span>
-          <span>Fast</span>
-        </div>
-        <button id="pauseBtn">⏸ Pause</button>
-        <button id="playBtn">▶ Play</button>
-      </div>
-
-      <div class="section info-box" id="infoBox">
-        <h3 id="infoName">Select a body</h3>
-        <p id="infoType">Type: –</p>
-        <p id="infoOrbit">Orbit: –</p>
-        <p id="infoDesc">Click a planet or choose from the list.</p>
-        <button id="focusBtn" disabled>🎯 Focus</button>
-      </div>
-    </div>
-  </div>
 
   <canvas id="bg"></canvas>
 
-  <script type="module" src="script.js"></script>
+  <script type="module" src="script.js?v=1"></script>
 </body>
 </html>
