@@ -1,16 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LUMINODE – 3D Solar System</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMINODE | 3D Solar System</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- THREE.JS CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- GSAP for smooth camera animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
+
 <body>
 
-  <canvas id="bg"></canvas>
+    <!-- SIDEBAR LEFT -->
+    <div id="sidebar">
+        <h1>🌌 LUMINODE</h1>
+        <h2>3D Planet Explorer</h2>
+        <p>Search any planet and the camera will automatically fly to it.</p>
 
+        <div id="searchBox">
+            <input id="searchInput" type="text" placeholder="Search planet (Earth, Mars...)" />
+            <button id="searchBtn">Go</button>
+        </div>
 
-  <script type="module" src="script.js?v=1"></script>
+        <div id="planetInfo">
+            <h3 id="planetName">No planet selected</h3>
+            <p id="planetSub">Search a planet to see its details.</p>
+        </div>
+    </div>
+
+    <!-- MAIN CANVAS -->
+    <canvas id="sceneCanvas"></canvas>
+
+    <!-- SCRIPT -->
+    <script src="script.js"></script>
+
 </body>
 </html>
