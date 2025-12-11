@@ -1,104 +1,146 @@
-/* ====== IMPORTS ====== */
-import * as THREE from "https://esm.run/three@0.164";
-import { OrbitControls } from "https://esm.run/three@0.164/examples/jsm/controls/OrbitControls.js";
+// ====== THREE.JS SETUP ======
+const canvas = document.getElementById("sceneCanvas");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
 
-/* ====== SETUP ====== */
-const canvas = document.getElementById("bg");
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
 
 const camera = new THREE.PerspectiveCamera(
   60,
   window.innerWidth / window.innerHeight,
   0.1,
-  1000
+  3000
 );
-camera.position.set(0, 40, 120);
+camera.position.set(0, 200, 400);
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-
-const loader = new THREE.TextureLoader();
-
-/* ====== BACKGROUND STARS ====== */
-const starsTex = loader.load("assets/stars.jpg");
-const starsGeo = new THREE.SphereGeometry(400, 32, 32);
-const starsMat = new THREE.MeshBasicMaterial({ map: starsTex, side: THREE.BackSide });
-scene.add(new THREE.Mesh(starsGeo, starsMat));
-
-/* ====== LIGHTS ====== */
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-const sunLight = new THREE.PointLight(0xffffff, 2);
-scene.add(sunLight);
-
-/* ====== SUN ====== */
-const sunTex = loader.load("assets/sun.jpg");
-const sun = new THREE.Mesh(
-  new THREE.SphereGeometry(10, 32, 32),
-  new THREE.MeshBasicMaterial({ map: sunTex })
-);
-scene.add(sun);
-sunLight.position.copy(sun.position);
-
-/* ====== PLANETS ====== */
-const planetData = [
-  { name: "Mercury", tex: "mercury.jpg", dist: 20, size: 2, speed: 0.02 },
-  { name: "Venus",   tex: "venus.jpg",   dist: 30, size: 3,   speed: 0.015 },
-  { name: "Earth",   tex: "earth.jpg",   dist: 40, size: 3.2, speed: 0.012 },
-  { name: "Mars",    tex: "mars.jpg",    dist: 50, size: 2.5, speed: 0.01 },
-  { name: "Jupiter", tex: "jupiter.jpg", dist: 70, size: 7,   speed: 0.008 },
-  { name: "Saturn",  tex: "saturn.jpg",  dist: 90, size: 6,   speed: 0.006 },
-  { name: "Uranus",  tex: "uranus.jpg",  dist:110, size: 4,   speed: 0.004 },
-  { name: "Neptune", tex: "neptune.jpg", dist:130, size: 4,   speed: 0.003 }
-];
-
-const planets = [];
-
-planetData.forEach(p => {
-  const planet = new THREE.Mesh(
-    new THREE.SphereGeometry(p.size, 24, 24),
-    new THREE.MeshStandardMaterial({ map: loader.load("assets/" + p.tex) })
-  );
-  planet.userData = { dist: p.dist, speed: p.speed };
-  scene.add(planet);
-  planets.push(planet);
-
-  /* ====== Orbit Lines ====== */
-  const curve = new THREE.EllipseCurve(0,0,p.dist,p.dist);
-  const points = curve.getPoints(64);
-  const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
-  const orbit = new THREE.Line(
-    orbitGeo,
-    new THREE.LineBasicMaterial({ color: 0x555555 })
-  );
-  orbit.rotation.x = Math.PI / 2;
-  scene.add(orbit);
-});
-
-/* ====== CONTROLS ====== */
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-/* ====== ANIMATION ====== */
+// ====== LIGHTS ======
+const light = new THREE.PointLight(0xffffff, 2.2);
+light.position.set(0, 0, 0);
+scene.add(light);
+
+// ====== SUN ======
+const sunGeo = new THREE.SphereGeometry(18, 50, 50);
+const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff4a3 });
+const sun = new THREE.Mesh(sunGeo, sunMat);
+scene.add(sun);
+
+// ====== PLANETS DATA ======
+const planetData = [
+  { name: "Mercury", radius: 4, orbit: 40, speed: 4.7, color: 0xb5b5b5 },
+  { name: "Venus", radius: 6, orbit: 60, speed: 3.5, color: 0xffd79a },
+  { name: "Earth", radius: 7, orbit: 80, speed: 2.9, color: 0x4aaeff },
+  { name: "Mars", radius: 6, orbit: 100, speed: 2.4, color: 0xff6b47 },
+  { name: "Jupiter", radius: 14, orbit: 130, speed: 1.3, color: 0xf1e1c2 },
+  { name: "Saturn", radius: 12, orbit: 160, speed: 0.97, color: 0xfbeec0 },
+  { name: "Uranus", radius: 10, orbit: 200, speed: 0.68, color: 0xa8eaff },
+  { name: "Neptune", radius: 10, orbit: 240, speed: 0.54, color: 0x6f86ff }
+];
+
+const planets = {}; // لحفظ الكواكب
+
+// ====== CREATE PLANETS + ORBITS ======
+planetData.forEach((p) => {
+  // orbit ring
+  const orbitGeo = new THREE.RingGeometry(p.orbit - 0.2, p.orbit + 0.2, 80);
+  const orbitMat = new THREE.MeshBasicMaterial({
+    color: 0x3b5b99,
+    side: THREE.DoubleSide,
+    opacity: 0.4,
+    transparent: true
+  });
+  const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+  orbit.rotation.x = Math.PI / 2;
+  scene.add(orbit);
+
+  // Create pivot
+  const pivot = new THREE.Object3D();
+  scene.add(pivot);
+
+  // Create planet
+  const geo = new THREE.SphereGeometry(p.radius, 32, 32);
+  const mat = new THREE.MeshStandardMaterial({ color: p.color });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(p.orbit, 0, 0);
+  pivot.add(mesh);
+
+  // Save object
+  planets[p.name.toLowerCase()] = {
+    pivot,
+    mesh,
+    data: p,
+    angle: Math.random() * Math.PI * 2
+  };
+});
+
+// ====== SEARCH FOCUS ======
+function focusPlanet(name) {
+  const p = planets[name.toLowerCase()];
+  if (!p) return;
+
+  // Target position
+  const worldPos = p.mesh.getWorldPosition(new THREE.Vector3());
+  const newCamPos = worldPos.clone().add(new THREE.Vector3(0, 40, 70));
+
+  // Smooth movement
+  gsap.to(camera.position, {
+    x: newCamPos.x,
+    y: newCamPos.y,
+    z: newCamPos.z,
+    duration: 1.4,
+    ease: "power2.out"
+  });
+
+  gsap.to(controls.target, {
+    x: worldPos.x,
+    y: worldPos.y,
+    z: worldPos.z,
+    duration: 1.4,
+    ease: "power2.out"
+  });
+
+  // Show info
+  document.getElementById("planetName").textContent = p.data.name;
+  document.getElementById("planetSub").textContent =
+    `Orbit: ${p.data.orbit} AU • Rotation realistic • Speed: ${p.data.speed}`;
+}
+
+// Search button
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const input = document.getElementById("searchInput").value.trim();
+  focusPlanet(input);
+});
+
+// Enter key search
+document
+  .getElementById("searchInput")
+  .addEventListener("keydown", (e) => {
+    if (e.key === "Enter") focusPlanet(e.target.value.trim());
+  });
+
+// ====== ANIMATION LOOP ======
 function animate() {
   requestAnimationFrame(animate);
-  const t = Date.now() * 0.001;
 
-  planets.forEach(planet => {
-    const { dist, speed } = planet.userData;
-    planet.position.x = Math.cos(t * speed) * dist;
-    planet.position.z = Math.sin(t * speed) * dist;
-    planet.rotation.y += 0.01;
+  // move planets
+  planetData.forEach((p) => {
+    const obj = planets[p.name.toLowerCase()];
+    obj.angle += p.speed * 0.0005; // realistic orbital speed
+    const x = Math.cos(obj.angle) * p.orbit;
+    const z = Math.sin(obj.angle) * p.orbit;
+
+    obj.mesh.position.set(x, 0, z);
+
+    // rotation around itself
+    obj.mesh.rotation.y += 0.01;
   });
 
   controls.update();
   renderer.render(scene, camera);
 }
-animate();
 
-/* ====== RESIZE ====== */
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+animate();
