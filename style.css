@@ -1,16 +1,74 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  overflow: hidden;
-  background: #000;
+    margin: 0;
+    overflow: hidden;
+    font-family: "Segoe UI", sans-serif;
+    background: #000;
 }
 
-#bg {
-  position: fixed;
-  inset: 0;
-  display: block;
+/* ---- SIDEBAR ---- */
+#sidebar {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 280px;
+    padding: 20px;
+    background: rgba(20, 20, 40, 0.85);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    color: white;
+}
+
+#sidebar h1 {
+    margin: 0 0 5px 0;
+    font-size: 28px;
+}
+
+#sidebar p {
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+/* ---- SEARCH BOX ---- */
+#searchBox {
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+#searchBtn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #4da3ff;
+    color: white;
+    font-weight: bold;
+}
+
+#planetInfo {
+    margin-top: 20px;
+}
+
+#planetName {
+    font-size: 20px;
+    color: #74baff;
+}
+
+#planetSub {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* ---- CANVAS ---- */
+#sceneCanvas {
+    width: 100vw;
+    height: 100vh;
+    display: block;
 }
